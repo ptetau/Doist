@@ -1,7 +1,7 @@
 # CH-0001 · Models
 
-Intent: IN-0001 · Scope: CAP-models · Status: planned · Ticket: none · Branch: none · Base: main
-Tests-Locked: none
+Intent: IN-0001 · Scope: CAP-models · Status: in review · Ticket: none · Branch: pdlc/CH-0001-models · Base: ccr-1ef8bdfa-1cxxi7
+Tests-Locked: c61b18d
 
 ## Delivers
 
@@ -23,8 +23,6 @@ The engine can describe an F# record type as a model plan. The plan gives kinds,
   has the kind reference to `TodoList`.
 - Given the type defaults of the todo app. When the engine describes `Todo`, then `Done`
   has the kind boolean, and `CompletedAt` has the kind optional of timestamp.
-- Given a record type with no fields. When the engine describes it, then the plan has no
-  fields and no error. (assumed)
 - Given the union type `Priority` as a model. When the engine describes it, then the result
   is the error `WRONG_CONFIG_TYPE` with the message "Priority is not a record type."
   (assumed)
@@ -132,7 +130,34 @@ In `src/Typed.Engine/Overrides.fs`, module `Typed.Engine.Overrides`:
 - `referencedFields: Expr -> string list`, `fieldsOf: OverrideItem -> string list`
 - `titleFieldName: Field list -> OverrideItem list -> string option`
 
-The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement, named with the requirement ID in double backticks, such as ``module ``CAP-models.R1`` ``. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
+Types for the checks. The acceptance lines name the todo app. That app is a later change, so
+the checks declare these types themselves, exactly as written here, in the check file:
+
+```fsharp
+[<TitleType>]
+type Title      = Title of string
+type Notes      = Notes of string
+type Priority   = Low | Normal | High
+type TimeZoneId = TimeZoneId of string
+type ExternalId = ExternalId of string
+
+type User     = { Subject: ExternalId; DisplayName: Title; TimeZone: TimeZoneId }
+type TodoList = { Name: Title; Archived: bool }
+type Todo     = { List: Ref<TodoList>; Title: Title; Notes: Notes option; Priority: Priority
+                  Due: DateOnly option; Done: bool; CompletedAt: DateTimeOffset option }
+```
+
+The type defaults of the todo app are these four entries, and no others. `Priority` and
+`Ref<TodoList>` get their kinds from the engine, not from the list.
+
+| Clr | Kind | Check | Hidden | Unique |
+|---|---|---|---|---|
+| `Title` | `Text 200` | no line break | false | false |
+| `Notes` | `Text 5000` | none | false | false |
+| `TimeZoneId` | `Text 64` | known IANA zone | false | false |
+| `ExternalId` | `Text 255` | none | true | true |
+
+The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement. Name it with the requirement ID, with a hyphen in place of the dot, in double backticks: ``module ``CAP-models-R1`` ``. F# does not allow a dot in a module name. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
 
 ### Test seams
 
@@ -152,43 +177,43 @@ none
 
 ## Steps
 
-### Step 1 · Each field gets a kind from its type · [ ]
+### Step 1 · Each field gets a kind from its type · [x]
 
 - Requirement: CAP-models.R1
 - Check: the checks named `CAP-models.R1 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
 - Done when: every check of CAP-models.R1 (each field gets a kind from its type) passes
 
-### Step 2 · A type with no default is an error that names each engine · [ ]
+### Step 2 · A type with no default is an error that names each engine · [x]
 
 - Requirement: CAP-models.R2
 - Check: the checks named `CAP-models.R2 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
 - Done when: every check of CAP-models.R2 (a type with no default is an error that names each engine) passes
 
-### Step 3 · The system fields are known and never written from a model · [ ]
+### Step 3 · The system fields are known and never written from a model · [x]
 
 - Requirement: CAP-models.R3
 - Check: the checks named `CAP-models.R3 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
 - Done when: every check of CAP-models.R3 (the system fields are known and never written from a model) passes
 
-### Step 4 · The label comes from the field name · [ ]
+### Step 4 · The label comes from the field name · [x]
 
 - Requirement: CAP-models.R4
 - Check: the checks named `CAP-models.R4 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
 - Done when: every check of CAP-models.R4 (the label comes from the field name) passes
 
-### Step 5 · Wide text is text longer than 400 characters · [ ]
+### Step 5 · Wide text is text longer than 400 characters · [x]
 
 - Requirement: CAP-models.R5
 - Check: the checks named `CAP-models.R5 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
 - Done when: every check of CAP-models.R5 (wide text is text longer than 400 characters) passes
 
-### Step 6 · The title field is marked or named · [ ]
+### Step 6 · The title field is marked or named · [x]
 
 - Requirement: CAP-models.R6
 - Check: the checks named `CAP-models.R6 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
 - Done when: every check of CAP-models.R6 (the title field is marked or named) passes
 
-### Step 7 · Overrides take typed field selectors · [ ]
+### Step 7 · Overrides take typed field selectors · [x]
 
 - Requirement: CAP-models.R7
 - Check: the checks named `CAP-models.R7 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
@@ -201,3 +226,17 @@ none
 ## Progress log
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-models` as the ready stage left them.
+- 2026-10-19T05:43:55+00:00 · Tests: the test writer wrote 30 checks in `CAP-models.Tests.fs` and the test
+  project. Red: `dotnet test` fails to compile, because `Typed.Engine` does not exist yet.
+  Every error names a missing symbol of the Interface. No error is a fault in a check.
+  Locked at 5dba628.
+- 2026-10-19T05:47:07+00:00 · Build round 1: the builder found that F# rejects a dot in a module name. The
+  test writer renamed the seven modules with a hyphen. The check names did not change.
+  The builder's engine code is in the working tree, so the checks now run. Locked again
+  at c61b18d.
+- 2026-10-19T05:48:21+00:00 · Build: the builder wrote `Model.fs`, `Overrides.fs`, the project file, and
+  `.gitignore`. All 30 checks pass. The check files did not change after the lock. Commit
+  `367dc43`.
+- 2026-10-19T05:55:19+00:00 · Verify round 1: 30 of 30 checks pass, one group for each requirement. The
+  check files did not change after the lock. Specification, security, quality, and
+  privacy passed with 0 problems. Compliance does not apply. No follow-up was filed.

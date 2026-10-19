@@ -1,1 +1,4 @@
 pdlc/.tools/
+bin/
+obj/
+build/

@@ -1,0 +1,126 @@
+{
+  "kind": "terminal",
+  "title": "CH-0001 \u00b7 Models",
+  "steps": [
+    {
+      "caption": "CH-0001 \u00b7 Build the engine library",
+      "run": "dotnet build src/Typed.Engine/Typed.Engine.fsproj --nologo -v q"
+    },
+    {
+      "caption": "CAP-models.R1 \u00b7 Title has the kind text 200",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R1.1"
+    },
+    {
+      "caption": "CAP-models.R1 \u00b7 Notes has the kind optional of text 5000",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R1.2"
+    },
+    {
+      "caption": "CAP-models.R1 \u00b7 Priority has the kind enum Low, Normal, High",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R1.3"
+    },
+    {
+      "caption": "CAP-models.R1 \u00b7 Due has the kind optional of date",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R1.4"
+    },
+    {
+      "caption": "CAP-models.R1 \u00b7 List has the kind reference to TodoList",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R1.5"
+    },
+    {
+      "caption": "CAP-models.R1 \u00b7 Done is boolean, CompletedAt is optional of timestamp",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R1.6"
+    },
+    {
+      "caption": "CAP-models.R1 \u00b7 A union as a model is WRONG_CONFIG_TYPE",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R1.7"
+    },
+    {
+      "caption": "CAP-models.R2 \u00b7 Title list has no default, names each engine",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R2.1"
+    },
+    {
+      "caption": "CAP-models.R2 \u00b7 Two fields with no default give two errors",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R2.2"
+    },
+    {
+      "caption": "CAP-models.R3 \u00b7 The system field names are known",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R3.1"
+    },
+    {
+      "caption": "CAP-models.R3 \u00b7 The plan of Todo holds seven fields, no system field",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R3.2"
+    },
+    {
+      "caption": "CAP-models.R4 \u00b7 CompletedAt gives Completed at",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R4.1"
+    },
+    {
+      "caption": "CAP-models.R4 \u00b7 Due gives Due",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R4.2"
+    },
+    {
+      "caption": "CAP-models.R4 \u00b7 TimeZone gives Time zone",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R4.3"
+    },
+    {
+      "caption": "CAP-models.R4 \u00b7 ExternalId gives External id",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R4.4"
+    },
+    {
+      "caption": "CAP-models.R4 \u00b7 HasDue gives Has due",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R4.5"
+    },
+    {
+      "caption": "CAP-models.R5 \u00b7 Notes is wide",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R5.1"
+    },
+    {
+      "caption": "CAP-models.R5 \u00b7 Title is not wide",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R5.2"
+    },
+    {
+      "caption": "CAP-models.R5 \u00b7 Text of length 400 is not wide",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R5.3"
+    },
+    {
+      "caption": "CAP-models.R5 \u00b7 Text of length 401 is wide",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R5.4"
+    },
+    {
+      "caption": "CAP-models.R6 \u00b7 TodoList has the title field Name",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R6.1"
+    },
+    {
+      "caption": "CAP-models.R6 \u00b7 User has the title field DisplayName",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R6.2"
+    },
+    {
+      "caption": "CAP-models.R6 \u00b7 NoTitle has no title field",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R6.3"
+    },
+    {
+      "caption": "CAP-models.R6 \u00b7 titleField override names Count",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R6.4"
+    },
+    {
+      "caption": "CAP-models.R7 \u00b7 The selector for Due reads the name Due",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R7.1"
+    },
+    {
+      "caption": "CAP-models.R7 \u00b7 listSort gives one ListSort item for Due",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R7.2"
+    },
+    {
+      "caption": "CAP-models.R7 \u00b7 listColumns holds Title then Due, in order",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R7.3"
+    },
+    {
+      "caption": "CAP-models.R7 \u00b7 listView uses the field Archived only",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0001-models/show.fsx R7.4"
+    },
+    {
+      "caption": "CH-0001 \u00b7 All 30 checks of CAP-models pass",
+      "run": "dotnet test tests/Typed.Engine.Tests --filter DisplayName~CAP-models --nologo -v q"
+    }
+  ]
+}
