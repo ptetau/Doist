@@ -13,8 +13,8 @@ module ValidateFixtures =
     let oneLine (s: string) = if s.IndexOfAny([| '\r'; '\n' |]) >= 0 then [ "must be on one line" ] else []
 
     let knownZone (s: string) =
-        try TimeZoneInfo.FindSystemTimeZoneById s |> ignore; []
-        with _ -> [ "must be a known time zone, such as Pacific/Auckland" ]
+        if TimeZoneInfo.GetSystemTimeZones() |> Seq.exists (fun z -> z.Id = s) then []
+        else [ "must be a known time zone, such as Pacific/Auckland" ]
 
     /// The defaults of the todo app, with the rule of each type, as the spec writes them.
     let defaults : TypeDefault list =
