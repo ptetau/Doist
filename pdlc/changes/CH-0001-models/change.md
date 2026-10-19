@@ -1,7 +1,7 @@
 # CH-0001 · Models
 
 Intent: IN-0001 · Scope: CAP-models · Status: testing · Ticket: none · Branch: pdlc/CH-0001-models · Base: ccr-1ef8bdfa-1cxxi7
-Tests-Locked: none
+Tests-Locked: 5dba628
 
 ## Delivers
 
@@ -226,3 +226,7 @@ none
 ## Progress log
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-models` as the ready stage left them.
+- 2026-10-19T05:43:55+00:00 · Tests: the test writer wrote 30 checks in `CAP-models.Tests.fs` and the test
+  project. Red: `dotnet test` fails to compile, because `Typed.Engine` does not exist yet.
+  Every error names a missing symbol of the Interface. No error is a fault in a check.
+  Locked at 5dba628.
