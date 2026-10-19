@@ -1,6 +1,6 @@
 # CH-0005 · Checks
 
-Intent: IN-0001 · Scope: CAP-checks · Status: planned · Ticket: none · Branch: none · Base: main
+Intent: IN-0001 · Scope: CAP-checks · Status: testing · Ticket: none · Branch: pdlc/CH-0005-checks · Base: pdlc/CH-0004-persist
 Tests-Locked: none
 
 ## Delivers
