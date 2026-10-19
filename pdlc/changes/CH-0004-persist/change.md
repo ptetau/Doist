@@ -1,7 +1,7 @@
 # CH-0004 · Persist
 
 Intent: IN-0001 · Scope: CAP-persist · Status: testing · Ticket: none · Branch: pdlc/CH-0004-persist · Base: pdlc/CH-0003-validate
-Tests-Locked: none
+Tests-Locked: 1e2b637
 
 ## Delivers
 
@@ -150,7 +150,9 @@ Schema and queries (pure):
 
 The store (runs SQL):
 
-- `type Store`: made by `Store.create (conn: System.Data.Common.DbConnection) (dialect: Dialect) (now: unit -> DateTimeOffset)`.
+- `type Store`: made by `Store.create (conn: System.Data.Common.DbConnection) (dialect: Dialect) (now: unit -> DateTimeOffset) (onBeforeChildDelete: (int -> unit) option)`. The four arguments are curried. Pass `None` for no hook.
+- `Record.Values` holds each field in its stored form: text and a semantic text type as `string`, an enum as its case name `string`, a reference as `Guid`, a boolean as `bool`, a date as `DateOnly`, a timestamp as `DateTimeOffset`, a whole number as `int64`, and a decimal as `decimal`. An empty optional field has no key. (assumed)
+- `Shape` and `Rename` are F# records, so two equal shapes compare equal. `migration None next renames` gives exactly `schema SqlServer` for the models of `next`. The migration always writes SQL Server. (assumed)
 - `type Page = { Rows: Record list; Next: string option }`
 - `find: Store -> Scope -> Model -> Guid -> Result<Record, Finding>` · errors: `NOT_FOUND`
 - `page: Store -> Scope -> Model -> OverrideItem list -> Access -> view: string option -> parent: Guid option -> cursor: string option -> size: int option -> Result<Page, Finding>` · errors: `VALIDATION_FAILED` with `Field = Some "limit"` or `Some "cursor"`
@@ -243,3 +245,7 @@ none
 ## Progress log
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-persist` as the ready stage left them.
+- 2026-10-19T06:33:28+00:00 · Tests: the test writer wrote 47 checks in `CAP-persist.Tests.fs`, on SQLite in
+  memory. The Interface settled the curried `Store.create`, the stored forms in
+  `Record.Values`, and the record shapes. Red: the checks fail to compile, because
+  `Typed.Engine.Persist` does not exist yet. Locked at 1e2b637.
