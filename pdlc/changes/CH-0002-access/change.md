@@ -1,6 +1,6 @@
 # CH-0002 · Access
 
-Intent: IN-0001 · Scope: CAP-access · Status: building · Ticket: none · Branch: pdlc/CH-0002-access · Base: pdlc/CH-0001-models
+Intent: IN-0001 · Scope: CAP-access · Status: in review · Ticket: none · Branch: pdlc/CH-0002-access · Base: pdlc/CH-0001-models
 Tests-Locked: da2df15
 
 ## Delivers
@@ -176,3 +176,7 @@ none
   which broke CAP-access.R3 (sealed scope). The builder removed it. `Scope` is a record
   with private fields. All 54 checks pass. The check files did not change after the lock.
   Commit `25a51a9`.
+- 2026-10-19T06:07:18+00:00 · Verify round 1: 54 of 54 checks pass, one group for each requirement. The
+  check files did not change after the lock. Specification, security, quality, and
+  privacy passed with 0 problems. Compliance does not apply. Filed IN-0007 (checkChange
+  fails closed) from the security follow-ups.
