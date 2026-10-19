@@ -136,7 +136,7 @@ none
 ## Check files
 
 - tests/Typed.Engine.Tests/CAP-validate.Tests.fs
-- tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj: the Compile entry of this spec
+- tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj
 
 ## Steps
 

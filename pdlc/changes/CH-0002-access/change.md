@@ -122,7 +122,7 @@ none
 ## Check files
 
 - tests/Typed.Engine.Tests/CAP-access.Tests.fs
-- tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj: the Compile entry of this spec
+- tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj
 
 ## Steps
 
@@ -164,5 +164,6 @@ none
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-access` as the ready stage left them.
 - 2026-10-19T05:58:38+00:00 · Tests: the test writer wrote 24 checks in `CAP-access.Tests.fs`. The Interface
-  gained the `Record` entry that R4 and R5 need. Red: the checks fail to compile, because
+  gained the `Record` entry that CAP-access.R4 (read-only refusal) and R5 (owner from
+  parent) need. Red: the checks fail to compile, because
   `Typed.Engine.Access` does not exist yet. Locked at da2df15.
