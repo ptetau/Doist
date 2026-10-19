@@ -61,8 +61,8 @@ Look for these traps:
 ````
 # CH-0003 · Validate
 
-Intent: IN-0001 · Scope: CAP-validate · Status: building · Ticket: none · Branch: pdlc/CH-0003-validate · Base: pdlc/CH-0002-access
-Tests-Locked: 6f34681
+Intent: IN-0001 · Scope: CAP-validate · Status: in review · Ticket: none · Branch: pdlc/CH-0003-validate · Base: pdlc/CH-0002-access
+Tests-Locked: 461fba1
 
 ## Delivers
 
@@ -224,49 +224,49 @@ none
 
 ## Steps
 
-### Step 1 · Validation returns one error list for each field · [ ]
+### Step 1 · Validation returns one error list for each field · [x]
 
 - Requirement: CAP-validate.R1
 - Check: the checks named `CAP-validate.R1 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R1 (validation returns one error list for each field) passes
 
-### Step 2 · A `Title` is 1 to 200 characters on one line, trimmed · [ ]
+### Step 2 · A `Title` is 1 to 200 characters on one line, trimmed · [x]
 
 - Requirement: CAP-validate.R2
 - Check: the checks named `CAP-validate.R2 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R2 (a `title` is 1 to 200 characters on one line, trimmed) passes
 
-### Step 3 · `Notes` is up to 5,000 characters and can be empty · [ ]
+### Step 3 · `Notes` is up to 5,000 characters and can be empty · [x]
 
 - Requirement: CAP-validate.R3
 - Check: the checks named `CAP-validate.R3 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R3 (`notes` is up to 5,000 characters and can be empty) passes
 
-### Step 4 · A `TimeZoneId` is a known IANA zone · [ ]
+### Step 4 · A `TimeZoneId` is a known IANA zone · [x]
 
 - Requirement: CAP-validate.R4
 - Check: the checks named `CAP-validate.R4 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R4 (a `timezoneid` is a known iana zone) passes
 
-### Step 5 · A reference must point at a record · [ ]
+### Step 5 · A reference must point at a record · [x]
 
 - Requirement: CAP-validate.R5
 - Check: the checks named `CAP-validate.R5 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R5 (a reference must point at a record) passes
 
-### Step 6 · A `rule` override adds its message when its predicate fails · [ ]
+### Step 6 · A `rule` override adds its message when its predicate fails · [x]
 
 - Requirement: CAP-validate.R6
 - Check: the checks named `CAP-validate.R6 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R6 (a `rule` override adds its message when its predicate fails) passes
 
-### Step 7 · An enum value must be a known case · [ ]
+### Step 7 · An enum value must be a known case · [x]
 
 - Requirement: CAP-validate.R7
 - Check: the checks named `CAP-validate.R7 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R7 (an enum value must be a known case) passes
 
-### Step 8 · Raw input parses by kind, or gives a field error · [ ]
+### Step 8 · Raw input parses by kind, or gives a field error · [x]
 
 - Requirement: CAP-validate.R8
 - Check: the checks named `CAP-validate.R8 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
@@ -284,9 +284,24 @@ none
   checks fail to compile, because `Typed.Engine.Validate` does not exist yet. Locked at
   7fab997.
 - 2026-10-19T06:15:23+00:00 · Build round 1: the builder found that `knownZone` in the Interface accepted
-  "pacific/auckland" on Linux, so one R4 check failed against correct code. The rule now
+  "pacific/auckland" on Linux. One CAP-validate.R4 (time zone) check failed against correct code. The rule now
   matches the zone id exactly. The test writer mirrored it. All 87 checks pass with the
   builder's code. Locked again at 6f34681.
+- 2026-10-19T06:16:19+00:00 · Build: the builder wrote `Validate.fs`. All 87 checks pass. The check files did
+  not change after the lock. Commit `9f44a59`. The builder chose the message "cannot be read
+  from text" for a decimal, a timestamp, an id, or a reference, which no line covers.
+- 2026-10-19T06:21:54+00:00 · Verify round 1 failed. Quality named three repeats in `Validate.fs`. Sent back to
+  the build stage. Specification named one long sentence, now split. Filed IN-0008
+  (parse messages for all kinds), IN-0009 (parseField length), and IN-0010 (validate
+  never raises).
+- 2026-10-19T06:23:16+00:00 · Build round 2: the builder removed the three repeats that quality named. All 87
+  checks pass. The check files did not change after the lock. Commit `40d743a`.
+- 2026-10-19T06:26:52+00:00 · Verify round 2: 87 of 87 checks pass, one group for each requirement. All four
+  remits that apply passed with 0 problems. The follow-ups repeat IN-0008 (parse messages
+  for all kinds), IN-0009 (parseField length), and IN-0010 (validate never raises).
+- 2026-10-19T06:27:54+00:00 · Gate correction: the gate read a wrong version in the tests review that one check
+  did not catch, an untrimmed title under 200 characters. The test writer added a check
+  that `parseField` trims the title. It passes. Locked again at 461fba1.
 ````
 
 ## The spec it covers: title and summary
@@ -311,7 +326,7 @@ type, and from `rule` overrides.
 
 ### CAP-validate.R1 · Validation returns one error list for each field
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 The result of a check is a list of field errors. Each field error holds the field name
 and one message. An empty list means that the record passes.
@@ -323,7 +338,7 @@ and one message. An empty list means that the record passes.
 
 ### CAP-validate.R2 · A `Title` is 1 to 200 characters on one line, trimmed
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a `TodoList` with the name "  Groceries  ", when validation runs, then the
   result is an empty list.
@@ -344,7 +359,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-validate.R3 · `Notes` is up to 5,000 characters and can be empty
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a `Todo` with `Notes = None`, when validation runs, then there is no error on
   `Notes`.
@@ -358,7 +373,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-validate.R4 · A `TimeZoneId` is a known IANA zone
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a `User` with the time zone "Pacific/Auckland", when validation runs, then there
   is no error on `TimeZone`.
@@ -370,7 +385,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-validate.R5 · A reference must point at a record
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a `Todo` with `List = Ref Guid.Empty`, when validation runs, then the result is one
   error on `List` with the message "is required".
@@ -379,7 +394,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-validate.R6 · A `rule` override adds its message when its predicate fails
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the override `rule <@ fun t -> t.Title @> (fun (Title s) -> s <> "forbidden")
   "Title is reserved"`, and a `Todo` with the title "forbidden". When validation runs,
@@ -389,7 +404,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-validate.R7 · An enum value must be a known case
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 The F# type makes an unknown case impossible in code. This rule applies to raw input, such
 as a form value or a JSON string.
@@ -402,7 +417,7 @@ as a form value or a JSON string.
 
 ### CAP-validate.R8 · Raw input parses by kind, or gives a field error
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 A form or the API gives each field as text. The engine parses the text by the kind of the
 field. A value that does not parse gives one error on that field.
@@ -691,10 +706,10 @@ naming must be simple and the same everywhere.
 ````
 diff --git a/tests/Typed.Engine.Tests/CAP-validate.Tests.fs b/tests/Typed.Engine.Tests/CAP-validate.Tests.fs
 new file mode 100644
-index 0000000..7483ac1
+index 0000000..a3fda04
 --- /dev/null
 +++ b/tests/Typed.Engine.Tests/CAP-validate.Tests.fs
-@@ -0,0 +1,273 @@
+@@ -0,0 +1,278 @@
 +namespace Typed.Engine.Tests
 +
 +open System
@@ -795,6 +810,11 @@ index 0000000..7483ac1
 +    [<Fact>]
 +    let ``CAP-validate.R2 a name with spaces at both ends is valid`` () =
 +        Assert.Empty(listErrors (listNamed "  Groceries  "))
++
++    [<Fact>]
++    let ``CAP-validate.R2 parseField trims the title`` () =
++        let v = parseOk (todoField "Title") (Some "  Groceries  ")
++        Assert.Equal(box (Title "Groceries"), v)
 +
 +    [<Fact>]
 +    let ``CAP-validate.R2 a name of spaces only is required`` () =
@@ -1085,6 +1105,11 @@ module ``CAP-validate-R2`` =
     [<Fact>]
     let ``CAP-validate.R2 a name with spaces at both ends is valid`` () =
         Assert.Empty(listErrors (listNamed "  Groceries  "))
+
+    [<Fact>]
+    let ``CAP-validate.R2 parseField trims the title`` () =
+        let v = parseOk (todoField "Title") (Some "  Groceries  ")
+        Assert.Equal(box (Title "Groceries"), v)
 
     [<Fact>]
     let ``CAP-validate.R2 a name of spaces only is required`` () =
