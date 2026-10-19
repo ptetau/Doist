@@ -17,7 +17,7 @@ scope of a caller is not found.
 
 ### CAP-access.R1 · Each model declares one of four rules
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given `rule<TodoList> owned`, when a caller reads the rule, then the model name is
   "TodoList" and the access is `Owned`.
@@ -29,7 +29,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-access.R2 · A read-only condition names a bool field of the parent
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given `ownedVia <@ fun t -> t.List @> |> readOnlyWhenParent <@ fun l -> l.Archived @>`,
   when a caller reads the rule, then the read-only condition names the model "TodoList"
@@ -40,7 +40,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-access.R3 · Only this capability can make a scope
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 A scope is an owner filter, a self scope, or the engine-only scope. The scope type has a private
 constructor. Other code cannot make one.
@@ -59,7 +59,7 @@ constructor. Other code cannot make one.
 
 ### CAP-access.R4 · A change to a read-only record is refused with its reason
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the list "Old" with `Archived = true`. When the engine checks a change to a todo of
   that list, then the result is the error `READ_ONLY_RECORD`. The reason is "This list is
@@ -76,7 +76,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-access.R5 · The owner of a child is copied from its parent
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a user `u1` and a list owned by `u1`. When the engine decides the owner of a new
   todo in that list, then the owner is `u1`.

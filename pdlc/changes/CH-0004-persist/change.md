@@ -184,7 +184,7 @@ The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requi
 ## Check files
 
 - tests/Typed.Engine.Tests/CAP-persist.Tests.fs
-- tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj: the Compile entry and the `Microsoft.Data.Sqlite` package reference
+- tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj
 
 ## Steps
 

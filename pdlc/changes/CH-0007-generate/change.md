@@ -86,7 +86,7 @@ The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requi
 ## Check files
 
 - tests/Typed.Engine.Tests/JOB-generate.Tests.fs
-- tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj: the Compile entry and the project reference to `Typed.Engine.Generator`
+- tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj
 
 ## Steps
 
