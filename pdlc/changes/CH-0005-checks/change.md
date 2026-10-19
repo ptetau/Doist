@@ -1,6 +1,6 @@
 # CH-0005 · Checks
 
-Intent: IN-0001 · Scope: CAP-checks · Status: in review · Ticket: none · Branch: pdlc/CH-0005-checks · Base: pdlc/CH-0004-persist
+Intent: IN-0001 · Scope: CAP-checks · Status: building · Ticket: none · Branch: pdlc/CH-0005-checks · Base: pdlc/CH-0004-persist
 Tests-Locked: 09ce3bfba7806424b1e5c4c262c49dde5bc47552
 
 ## Delivers
@@ -235,3 +235,4 @@ none
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-checks` as the ready stage left them.
 - Built: 176 checks pass (36 new). The builder added Checks.fs and its Compile entry.
 - Verified: all remits pass. Filed IN-0015 (stray access rule) as a follow-up.
+- Sent back to tests: the gate found two weak checks (R3 type order, R9 near-case label).
