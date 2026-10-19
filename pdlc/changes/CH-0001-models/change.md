@@ -177,43 +177,43 @@ none
 
 ## Steps
 
-### Step 1 · Each field gets a kind from its type · [ ]
+### Step 1 · Each field gets a kind from its type · [x]
 
 - Requirement: CAP-models.R1
 - Check: the checks named `CAP-models.R1 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
 - Done when: every check of CAP-models.R1 (each field gets a kind from its type) passes
 
-### Step 2 · A type with no default is an error that names each engine · [ ]
+### Step 2 · A type with no default is an error that names each engine · [x]
 
 - Requirement: CAP-models.R2
 - Check: the checks named `CAP-models.R2 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
 - Done when: every check of CAP-models.R2 (a type with no default is an error that names each engine) passes
 
-### Step 3 · The system fields are known and never written from a model · [ ]
+### Step 3 · The system fields are known and never written from a model · [x]
 
 - Requirement: CAP-models.R3
 - Check: the checks named `CAP-models.R3 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
 - Done when: every check of CAP-models.R3 (the system fields are known and never written from a model) passes
 
-### Step 4 · The label comes from the field name · [ ]
+### Step 4 · The label comes from the field name · [x]
 
 - Requirement: CAP-models.R4
 - Check: the checks named `CAP-models.R4 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
 - Done when: every check of CAP-models.R4 (the label comes from the field name) passes
 
-### Step 5 · Wide text is text longer than 400 characters · [ ]
+### Step 5 · Wide text is text longer than 400 characters · [x]
 
 - Requirement: CAP-models.R5
 - Check: the checks named `CAP-models.R5 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
 - Done when: every check of CAP-models.R5 (wide text is text longer than 400 characters) passes
 
-### Step 6 · The title field is marked or named · [ ]
+### Step 6 · The title field is marked or named · [x]
 
 - Requirement: CAP-models.R6
 - Check: the checks named `CAP-models.R6 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
 - Done when: every check of CAP-models.R6 (the title field is marked or named) passes
 
-### Step 7 · Overrides take typed field selectors · [ ]
+### Step 7 · Overrides take typed field selectors · [x]
 
 - Requirement: CAP-models.R7
 - Check: the checks named `CAP-models.R7 ...` in `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj`
@@ -234,3 +234,6 @@ none
   test writer renamed the seven modules with a hyphen. The check names did not change.
   The builder's engine code is in the working tree, so the checks now run. Locked again
   at c61b18d.
+- 2026-10-19T05:48:21+00:00 · Build: the builder wrote `Model.fs`, `Overrides.fs`, the project file, and
+  `.gitignore`. All 30 checks pass. The check files did not change after the lock. Commit
+  `367dc43`.
