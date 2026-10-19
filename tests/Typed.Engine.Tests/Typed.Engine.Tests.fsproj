@@ -11,6 +11,7 @@
     <Compile Include="CAP-validate.Tests.fs" />
     <Compile Include="CAP-persist.Tests.fs" />
     <Compile Include="CAP-checks.Tests.fs" />
+    <Compile Include="CAP-todo-app.Tests.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/Typed.Engine/Typed.Engine.fsproj" />
+    <ProjectReference Include="../../src/Todo.App/Todo.App.fsproj" />
   </ItemGroup>
 
 </Project>
