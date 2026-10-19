@@ -1,13 +1,13 @@
-# Handoff · CH-0003 · show → verify
+# Handoff · CH-0003 · verify → user
 
-Time: 2026-10-19T06:25:06+00:00
+Time: 2026-10-19T06:29:20+00:00
 
 ## Done
 
-Recorded `review.gif` again after build round 2, with 32 frames in a terminal. Frame 1
-builds the library. Frames 2 to 31 each run `show.fsx` for one acceptance line of
-CAP-validate.R1 (errors for each field) to R8 (raw input by kind). Frame 32 runs the 32
-checks of CAP-validate and shows "Passed! 32". The GIF shows 30 of 30 acceptance lines.
+Proposed CH-0003 (validate) as draft pull request https://github.com/ptetau/Doist/pull/4,
+against `pdlc/CH-0002-access`. All 88 checks of the branch pass. The four remits that
+apply passed with 0 problems in round 2. The eight requirements of CAP-validate
+(validation) are `verified`. The change is `in review`.
 
 ## Decided on defaults
 
@@ -15,16 +15,18 @@ checks of CAP-validate and shows "Passed! 32". The GIF shows 30 of 30 acceptance
 
 ## Open
 
-- none
+- The merge gate waits for CH-0004 (persist) to CH-0007 (generate).
+- Three follow-up intents await approval: IN-0008 (parse messages for all kinds), IN-0009
+  (parseField length), and IN-0010 (validate never raises).
 
 ## Look here
 
-- pdlc/changes/CH-0003-validate/review.gif and frames/
+- https://github.com/ptetau/Doist/pull/4
 
 ## Don't redo
 
-- The recording. The last frame was read after the second build.
+- The checks, the build, the recording, and the reviews of CH-0003 (validate).
 
 ## Next: do this first
 
-Verify, round 2. Quality must look again at `Validate.fs`.
+Start the tests stage of CH-0004 (persist), from the branch `pdlc/CH-0003-validate`.
