@@ -17,8 +17,8 @@ This section gives the command that runs the checks of this project, and the com
 runs only the checks for one requirement. Init writes this section. A project with no
 checks yet keeps its checks in `tests/`.
 
-- all: `dotnet test tests/`
-- one requirement: `dotnet test tests/ --filter "DisplayName~{req}"`
+- all: `dotnet test tests/Typed.Engine.Tests`
+- one requirement: `dotnet test tests/Typed.Engine.Tests --filter "DisplayName~{req}"`
 - check folders: `tests/`
 - ID form in check names: `dotted`
 

@@ -79,10 +79,15 @@ the walls and the Gherkin scenarios. Use the scenarios as the start of the check
 
 ## Changes
 
-The change stage writes this section. The section lists the changes that deliver this
-intent, in order.
+The changes, in stack order. Each change covers one spec.
 
-- none yet
+1. CH-0001 (CAP-models): The engine can describe an F# record type as a model plan.
+2. CH-0002 (CAP-access): Each model declares one access rule.
+3. CH-0003 (CAP-validate): One rule set checks a record and gives the errors for each field.
+4. CH-0004 (CAP-persist): The engine writes the schema, the foreign keys, the indexes, and the list queries for each model.
+5. CH-0005 (CAP-checks): Every build check runs over the models, the access rules, and the override sets.
+6. CH-0006 (CAP-todo-app): The todo app exists as models, type defaults, access rules, overrides, and two hooks, and nothing else.
+7. CH-0007 (JOB-generate): An app builder runs one command that prints every finding, sets the exit code, and writes the schema.
 
 ## Notes
 
@@ -134,60 +139,56 @@ intent, in order.
   `build/` (assumed)
 - CAP-todo-app is a capability, not a job, because the models and hooks are shared logic
   for the later page and API jobs (assumed)
+- Change stage: the project files (`Typed.Engine.fsproj`, `Todo.App.fsproj`, the generator
+  project, and the test project) are in no code map. Each change lists its own `Compile`
+  entries as parts of the shared file (assumed).
+- Change stage: shared contracts `Record`, `HookContext`, and the `ErrorCode` union live
+  in `Model.fs`, under CAP-models (model plan) (assumed).
+- Change stage: the checks command names the test project, `dotnet test
+  tests/Typed.Engine.Tests`, because `dotnet test` needs a project or solution file.
+- Change stage: a check proves JOB-generate.R1 (findings and exit code) and R2 (schema
+  file) with a changed `Config` through `Generator.run`. No check edits the app code
+  (assumed).
 
 ## Handoff
 
-### Handoff · IN-0001 · ready → change
+### Handoff · IN-0001 · change → tests
 
-Time: 2026-10-19T05:32:48+00:00
+Time: 2026-10-19T05:38:18+00:00
 
 ### Done
 
-Settled the implied behaviour of all 49 requirements: bad and empty input, limits, order,
-stored data, unsafe input, and open rules. Added CAP-checks.R11 (duplicate override), R12 (finding order)
-(finding order), R13 (sort or view that cannot be served), and CAP-validate.R8 (raw input
-by kind). Found one contradiction between CAP-access.R3 (self scope) and CAP-persist.R1 (tables)
-(no `Owner` column on `User`). The guessed side gave way. Set every requirement to `ready`
-and the intent to `ready`.
+Wrote seven change specs, one for each spec, in stack order. They are CH-0001 (models),
+CH-0002 (access), CH-0003 (validate), CH-0004 (persist), CH-0005 (checks), CH-0006 (todo
+app), and CH-0007 (generate). Each change copies its requirements from its spec and gives the F#
+interface, the test seams, the files, and the check files.
 
 ### Decided on defaults
 
-See the "Notes" of this intent. Each line that ends in (assumed) is a default from this
-stage or from intake.
+- The project files are shared parts, listed in each change (assumed)
+- `Record`, `HookContext`, and `ErrorCode` live in `Model.fs` (assumed)
+- CH-0004 (persist): `Dialect`, `queryCount`, `onBeforeChildDelete`, and `Rename` as seams and shapes (assumed)
+- CH-0002 (access): the read-only reason is built from the parent model name and the field (assumed)
+- CH-0007 (generate): `--out`, `Generator.run`, and `Config` as the seams (assumed)
 
 ### Open
 
 - The branch question: pdlc expects `main` and one `pdlc/CH-*` branch for each change.
-  This session is pinned to one branch. The user decides before the tests stage.
-- The change stage must give three test seams. The clock, for CAP-todo-app.R4
-  (completion hook) and R5 (overdue hook). A failure point inside the delete transaction,
-  for CAP-persist.R6 (child deletes). The paths of `build/shape.json` and
-  `build/schema.sql`, for CAP-persist.R8 (migration drop) and JOB-generate (the command).
+  This session is pinned to one branch. The user decides before the tests stage starts
+  CH-0001 (models).
 
 ### Look here
 
-- pdlc/specs/capabilities/CAP-*.md
-- pdlc/specs/jobs/JOB-generate.md
-- pdlc/specs/design/DES-errors.md, pdlc/specs/design/DES-names.md, and
-  pdlc/specs/design/DES-test-database.md
-- docs/design/typed-layers-engine.blueprint.md (section 5 for the module map)
+- pdlc/changes/CH-0001-models/change.md to pdlc/changes/CH-0007-generate/change.md
+- pdlc/config.md (the checks commands)
+- docs/design/typed-layers-engine.blueprint.md (section 6, the Gherkin scenarios)
 
 ### Don't redo
 
-- The requirement text. Each line is clear and has concrete values.
-- The error codes. Each failure line names a code that `DES-errors` holds.
+- The requirement text and the order of the changes.
 
 ### Next: do this first
 
-Plan one change for each spec, in this order:
-
-1. CAP-models (model plan)
-2. CAP-access (access rules)
-3. CAP-validate (validation)
-4. CAP-persist (storage)
-5. CAP-checks (build checks)
-6. CAP-todo-app (the first app)
-7. JOB-generate (the command)
-
-CAP-checks (build checks) comes after CAP-persist (storage). CAP-checks.R13 (sort or view
-that cannot be served) needs the view translator and the wide-text rule.
+Start CH-0001 (models). Its test writer must make the test project
+`tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` with xUnit and a project reference to
+`src/Typed.Engine/Typed.Engine.fsproj`.
