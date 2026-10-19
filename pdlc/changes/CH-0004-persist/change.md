@@ -1,7 +1,7 @@
 # CH-0004 · Persist
 
-Intent: IN-0001 · Scope: CAP-persist · Status: planned · Ticket: none · Branch: none · Base: main
-Tests-Locked: none
+Intent: IN-0001 · Scope: CAP-persist · Status: in review · Ticket: none · Branch: pdlc/CH-0004-persist · Base: pdlc/CH-0003-validate
+Tests-Locked: bbd2344
 
 ## Delivers
 
@@ -150,7 +150,17 @@ Schema and queries (pure):
 
 The store (runs SQL):
 
-- `type Store`: made by `Store.create (conn: System.Data.Common.DbConnection) (dialect: Dialect) (now: unit -> DateTimeOffset)`.
+- `type Store`: made by `Store.create (conn: System.Data.Common.DbConnection) (dialect: Dialect) (now: unit -> DateTimeOffset) (onBeforeChildDelete: (int -> unit) option)`. The four arguments are curried. Pass `None` for no hook.
+- `Record.Values` holds each field in its stored form (assumed). An empty optional field has no key. The forms are these:
+  - text, and a semantic text type: `string`
+  - an enum: its case name, as `string`
+  - a reference: `Guid`
+  - a boolean: `bool`
+  - a date: `DateOnly`
+  - a timestamp: `DateTimeOffset`
+  - a whole number: `int64`
+  - a decimal: `decimal`
+- `Shape` and `Rename` are F# records, so two equal shapes compare equal. `migration None next renames` gives exactly `schema SqlServer` for the models of `next`. The migration always writes SQL Server. (assumed)
 - `type Page = { Rows: Record list; Next: string option }`
 - `find: Store -> Scope -> Model -> Guid -> Result<Record, Finding>` · errors: `NOT_FOUND`
 - `page: Store -> Scope -> Model -> OverrideItem list -> Access -> view: string option -> parent: Guid option -> cursor: string option -> size: int option -> Result<Page, Finding>` · errors: `VALIDATION_FAILED` with `Field = Some "limit"` or `Some "cursor"`
@@ -166,6 +176,7 @@ Migrations:
 - `writeShape: path: string -> Shape -> unit`
 - `type Rename = { Model: string; From: string; To: string }`: the `renamedFrom` note. (assumed)
 - `migration: previous: Shape option -> next: Shape -> Rename list -> Result<string, Finding>` · errors: `UNPLANNED_DROP`, `UNSAFE_MIGRATION`
+- Where the shape is stored: `migration` is pure. The caller that gets `Ok` from it writes `next` with `writeShape path next`, and the next run reads it back with `readShape path`. That pair is the store step of CAP-persist.R8 (migration drop). The generator job is that caller. (assumed)
 
 The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement. Name it with the requirement ID, with a hyphen in place of the dot, in double backticks: ``module ``CAP-models-R1`` ``. F# does not allow a dot in a module name. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
 
@@ -188,49 +199,49 @@ The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requi
 
 ## Steps
 
-### Step 1 · Each model gets a table with its system columns · [ ]
+### Step 1 · Each model gets a table with its system columns · [x]
 
 - Requirement: CAP-persist.R1
 - Check: the checks named `CAP-persist.R1 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R1 (each model gets a table with its system columns) passes
 
-### Step 2 · Foreign keys are indexed and never cascade · [ ]
+### Step 2 · Foreign keys are indexed and never cascade · [x]
 
 - Requirement: CAP-persist.R2
 - Check: the checks named `CAP-persist.R2 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R2 (foreign keys are indexed and never cascade) passes
 
-### Step 3 · Each list query gets one index · [ ]
+### Step 3 · Each list query gets one index · [x]
 
 - Requirement: CAP-persist.R3
 - Check: the checks named `CAP-persist.R3 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R3 (each list query gets one index) passes
 
-### Step 4 · Every list query filters by owner and names its columns · [ ]
+### Step 4 · Every list query filters by owner and names its columns · [x]
 
 - Requirement: CAP-persist.R4
 - Check: the checks named `CAP-persist.R4 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R4 (every list query filters by owner and names its columns) passes
 
-### Step 5 · Keyset paging returns each record one time · [ ]
+### Step 5 · Keyset paging returns each record one time · [x]
 
 - Requirement: CAP-persist.R5
 - Check: the checks named `CAP-persist.R5 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R5 (keyset paging returns each record one time) passes
 
-### Step 6 · Deleting a parent deletes its children in one transaction · [ ]
+### Step 6 · Deleting a parent deletes its children in one transaction · [x]
 
 - Requirement: CAP-persist.R6
 - Check: the checks named `CAP-persist.R6 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R6 (deleting a parent deletes its children in one transaction) passes
 
-### Step 7 · A stale save fails with a conflict · [ ]
+### Step 7 · A stale save fails with a conflict · [x]
 
 - Requirement: CAP-persist.R7
 - Check: the checks named `CAP-persist.R7 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R7 (a stale save fails with a conflict) passes
 
-### Step 8 · A migration never drops a column without a note · [ ]
+### Step 8 · A migration never drops a column without a note · [x]
 
 - Requirement: CAP-persist.R8
 - Check: the checks named `CAP-persist.R8 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
@@ -243,3 +254,23 @@ none
 ## Progress log
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-persist` as the ready stage left them.
+- 2026-10-19T06:33:28+00:00 · Tests: the test writer wrote 47 checks in `CAP-persist.Tests.fs`, on SQLite in
+  memory. The Interface settled the curried `Store.create`. It also settled the stored
+  forms in `Record.Values`, and the record shapes. Red: the checks fail to compile, because
+  `Typed.Engine.Persist` does not exist yet. Locked at 1e2b637.
+- 2026-10-19T06:35:42+00:00 · Tests round 1: the review failed on a helper that could loop forever, and on a
+  page-of-200 line with no proof. The test writer bounded the loop and added a 210-row
+  check. Still red: `Typed.Engine.Persist` does not exist. Locked again at 81284e2.
+- 2026-10-19T06:38:04+00:00 · Tests round 2: the review failed on a system-column check that read the whole
+  schema. It also failed on the store step of CAP-persist.R8 (migration drop), which had no
+  proof. The
+  Interface now names `writeShape` as that step. The test writer fixed both. Locked again
+  at bbd2344.
+- 2026-10-19T06:46:50+00:00 · Build: the builder wrote `Persist.fs`. All 139 checks pass. The check files did
+  not change after the lock. Commit `066a033`. The builder named six points where the
+  Interface was silent. They are in the handoff for the verify reviewers.
+- 2026-10-19T06:56:21+00:00 · Verify round 1 failed on the caption of frame 40 (49 checks, 51 runs). Sent back
+  to show. Filed IN-0011 (store fails closed), IN-0012 (listQuery finding), IN-0013
+  (cursor privacy), and IN-0014 (persist tidy).
+- 2026-10-19T07:00:56+00:00 · Verify round 2: 139 of 139 checks pass, one group for each requirement. All four
+  remits that apply passed with 0 problems. The follow-ups repeat IN-0011 (store fails closed) to IN-0014 (persist tidy).
