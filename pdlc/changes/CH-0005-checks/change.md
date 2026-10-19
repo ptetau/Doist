@@ -1,7 +1,7 @@
 # CH-0005 · Checks
 
 Intent: IN-0001 · Scope: CAP-checks · Status: building · Ticket: none · Branch: pdlc/CH-0005-checks · Base: pdlc/CH-0004-persist
-Tests-Locked: 09ce3bfba7806424b1e5c4c262c49dde5bc47552
+Tests-Locked: 64c6b57ba2882b1c4f19e43f3e7f9a2fcb199913
 
 ## Delivers
 
