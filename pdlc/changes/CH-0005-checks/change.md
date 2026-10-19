@@ -1,7 +1,7 @@
 # CH-0005 · Checks
 
-Intent: IN-0001 · Scope: CAP-checks · Status: planned · Ticket: none · Branch: none · Base: main
-Tests-Locked: none
+Intent: IN-0001 · Scope: CAP-checks · Status: in review · Ticket: none · Branch: pdlc/CH-0005-checks · Base: pdlc/CH-0004-persist
+Tests-Locked: 64c6b57ba2882b1c4f19e43f3e7f9a2fcb199913
 
 ## Delivers
 
@@ -128,7 +128,7 @@ In `src/Typed.Engine/Checks.fs`, module `Typed.Engine.Checks`:
 - `run: TypeDefault list -> Type list -> AccessRule list -> ModelOverrides list -> Finding list`: every finding, errors and warnings, in model order then field order.
 - `errors: Finding list -> Finding list` and `warnings: Finding list -> Finding list`: the two halves of a result.
 - Each finding gives its code in `Code`, as `DES-errors` names it, and its text in `Message`. The messages are the quoted texts in the acceptance lines.
-- Codes: `MISSING_DEFAULT`, `MISSING_ACCESS_RULE`, `MISSING_FIELD`, `WRONG_CONFIG_TYPE`, `SYSTEM_FIELD_TARGET`, `DANGLING_REFERENCE`, `NO_TITLE_FIELD`, `UNSAFE_ESCAPE_HATCH` (warning), `REDUNDANT_OVERRIDE` (warning)
+- Codes: `MISSING_ACCESS_RULE`, `MISSING_FIELD`, `WRONG_CONFIG_TYPE`, `SYSTEM_FIELD_TARGET`, `DANGLING_REFERENCE`, `NO_TITLE_FIELD`, `UNSAFE_ESCAPE_HATCH` (warning), `REDUNDANT_OVERRIDE` (warning)
 
 The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement. Name it with the requirement ID, with a hyphen in place of the dot, in double backticks: ``module ``CAP-models-R1`` ``. F# does not allow a dot in a module name. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
 
@@ -233,3 +233,7 @@ none
 ## Progress log
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-checks` as the ready stage left them.
+- Built: 176 checks pass (36 new). The builder added Checks.fs and its Compile entry.
+- Verified: all remits pass. Filed IN-0015 (stray access rule) as a follow-up.
+- Sent back to tests: the gate found two weak checks (R3 type order, R9 near-case label).
+- Tests re-locked with sharper R3 and R9 checks. 179 checks pass. Other remits passed on the earlier lock.

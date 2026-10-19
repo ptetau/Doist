@@ -10,6 +10,7 @@
     <Compile Include="Access.fs" />
     <Compile Include="Validate.fs" />
     <Compile Include="Persist.fs" />
+    <Compile Include="Checks.fs" />
   </ItemGroup>
 
 </Project>

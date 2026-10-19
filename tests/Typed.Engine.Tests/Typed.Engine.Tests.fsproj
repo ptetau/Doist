@@ -10,6 +10,7 @@
     <Compile Include="CAP-access.Tests.fs" />
     <Compile Include="CAP-validate.Tests.fs" />
     <Compile Include="CAP-persist.Tests.fs" />
+    <Compile Include="CAP-checks.Tests.fs" />
   </ItemGroup>
 
   <ItemGroup>
