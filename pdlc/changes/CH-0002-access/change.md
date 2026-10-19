@@ -1,7 +1,7 @@
 # CH-0002 · Access
 
 Intent: IN-0001 · Scope: CAP-access · Status: testing · Ticket: none · Branch: pdlc/CH-0002-access · Base: pdlc/CH-0001-models
-Tests-Locked: none
+Tests-Locked: da2df15
 
 ## Delivers
 
@@ -94,6 +94,20 @@ In `src/Typed.Engine/Access.fs`, module `Typed.Engine.Access`:
 - `ownerFor: AccessRule list -> user: Guid -> model: string -> parent: Record option -> Result<Guid, Finding>`
   - errors: `NOT_FOUND` (the parent belongs to another user)
 
+`Record` comes from `Typed.Engine.Model` (CAP-models, the model plan), as do `Finding`,
+`ErrorCode`, and `Ref`. A check builds one directly:
+
+```fsharp
+type Record = { Model: string; Id: Guid; Owner: Guid option; Version: int64; Values: Map<string, obj> }
+
+let archivedList (owner: Guid) : Record =
+    { Model = "TodoList"; Id = Guid.NewGuid(); Owner = Some owner; Version = 1L
+      Values = Map [ "Name", box "Old"; "Archived", box true ] }
+```
+
+`checkChange` reads the read-only field of the parent from `Values`, by the field name that
+the rule gives, and expects a boxed `bool`. `ownerFor` reads the parent's `Owner`.
+
 The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement. Name it with the requirement ID, with a hyphen in place of the dot, in double backticks: ``module ``CAP-models-R1`` ``. F# does not allow a dot in a module name. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
 
 ### Test seams
@@ -149,3 +163,6 @@ none
 ## Progress log
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-access` as the ready stage left them.
+- 2026-10-19T05:58:38+00:00 · Tests: the test writer wrote 24 checks in `CAP-access.Tests.fs`. The Interface
+  gained the `Record` entry that R4 and R5 need. Red: the checks fail to compile, because
+  `Typed.Engine.Access` does not exist yet. Locked at da2df15.
