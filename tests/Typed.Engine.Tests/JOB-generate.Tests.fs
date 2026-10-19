@@ -40,6 +40,14 @@ module GenerateFixtures =
         let code = run cfg w
         code, linesOf (w.ToString())
 
+    /// Runs the entry that the command calls, with two separate writers.
+    /// Gives the exit code, the standard output text, and the standard error text.
+    let executeConfig (args: string[]) (cfg: Config) : int * string * string =
+        use out = new StringWriter()
+        use err = new StringWriter()
+        let code = execute args cfg out err
+        code, out.ToString(), err.ToString()
+
     /// The todo app with the access rule of Todo removed.
     let withoutTodoRule (outDir: string) : Config =
         let cfg = todoConfig outDir
@@ -112,15 +120,20 @@ module ``JOB-generate-R1`` =
         Assert.DoesNotContain("usage: generate", stderr)
 
     [<Fact>]
-    let ``JOB-generate.R1 the library entry writes each finding line to the writer it is given`` () =
-        // The real command prints no finding for the todo app, so this check drives the library entry.
-        let code, lines = runConfig (withoutTodoRule (tempFolder ()))
+    let ``JOB-generate.R1 the error finding line goes to standard output and standard error stays empty`` () =
+        let dir = tempFolder ()
+        let code, stdout, stderr = executeConfig [| "generate"; "--out"; dir |] (withoutTodoRule dir)
         Assert.Equal(1, code)
-        let findings = lines |> List.filter (fun l -> l.StartsWith "error " || l.StartsWith "warning ")
-        Assert.NotEmpty findings
-        // Each finding line is "<severity> <code> <message>".
-        for l in findings do
-            Assert.Matches(@"^(error|warning) [A-Z_]+ .+$", l)
+        Assert.Contains("error MISSING_ACCESS_RULE Model Todo has no access rule.", linesOf stdout)
+        Assert.Equal("", stderr)
+
+    [<Fact>]
+    let ``JOB-generate.R1 the unsafe override warning goes to standard output and standard error stays empty`` () =
+        let dir = tempFolder ()
+        let code, stdout, stderr = executeConfig [| "generate"; "--out"; dir |] (withUnsafe dir)
+        Assert.Equal(0, code)
+        Assert.Contains("warning UNSAFE_ESCAPE_HATCH Unsafe escape hatch TodoList.rawName: uses raw SQL", linesOf stdout)
+        Assert.Equal("", stderr)
 
 module ``JOB-generate-R2`` =
 
@@ -135,8 +148,13 @@ module ``JOB-generate-R2`` =
         Assert.Equal(3, Regex.Matches(sql, "CREATE TABLE", RegexOptions.IgnoreCase).Count)
         for name in [ "User"; "TodoList"; "Todo" ] do
             Assert.Matches(Regex("CREATE TABLE\\s+\\S*" + name + "\\b", RegexOptions.IgnoreCase), sql)
-        Assert.Contains("FOREIGN KEY", sql, StringComparison.OrdinalIgnoreCase)
         Assert.Matches(Regex("CREATE\\s+(UNIQUE\\s+)?(NONCLUSTERED\\s+)?INDEX", RegexOptions.IgnoreCase), sql)
+        // Some statement that names the table Todo (not TodoList) holds a FOREIGN KEY.
+        let statements = Regex.Split(sql, @";|^\s*GO\s*$", RegexOptions.Multiline)
+        let namesTodo (s: string) = Regex.IsMatch(s, @"\bTodo\b")
+        Assert.Contains(statements, fun s -> namesTodo s && s.Contains("FOREIGN KEY", StringComparison.OrdinalIgnoreCase))
+        // Some index statement names the table Todo.
+        Assert.Contains(statements, fun s -> namesTodo s && Regex.IsMatch(s, @"CREATE\s+(UNIQUE\s+)?(NONCLUSTERED\s+)?INDEX", RegexOptions.IgnoreCase))
 
     [<Fact>]
     let ``JOB-generate.R2 the todo app also writes shape.json`` () =
@@ -177,16 +195,19 @@ module ``JOB-generate-R3`` =
         let hasToken (code: string) (l: string) =
             Regex.IsMatch(l, "(?<![A-Za-z0-9.])" + code + "(?![A-Za-z0-9]|\\.[0-9])")
         // A line for one code holds no token of the other two codes, so each code needs its own line.
-        let has (code: string) (words: string list) =
+        // The meaning is a regex on the lower-case line.
+        let has (code: string) (meaning: string) =
             let others = [ "0"; "1"; "2" ] |> List.filter (fun c -> c <> code)
             afterExit
             |> List.exists (fun l ->
                 hasToken code l
                 && others |> List.forall (fun o -> not (hasToken o l))
-                && words |> List.exists (fun w -> l.ToLowerInvariant().Contains w))
-        Assert.True(has "0" [ "error"; "success"; "ok" ], "exit code 0 has no meaning in the README")
-        Assert.True(has "1" [ "error" ], "exit code 1 has no meaning in the README")
-        Assert.True(has "2" [ "usage"; "unknown" ], "exit code 2 has no meaning in the README")
+                && Regex.IsMatch(l.ToLowerInvariant(), meaning))
+        // Code 0 means no error, success, or ok. The bare word "error" does not count.
+        Assert.True(has "0" @"\b(no errors?|success|ok)\b", "exit code 0 has no meaning in the README")
+        // Code 1 means error. The phrase "no error" does not count.
+        Assert.True(has "1" @"(?<!\bno )\berrors?\b", "exit code 1 has no meaning in the README")
+        Assert.True(has "2" @"usage|unknown", "exit code 2 has no meaning in the README")
 
     [<Fact>]
     let ``JOB-generate.R3 the README gives the command dotnet test tests/`` () =
