@@ -25,8 +25,11 @@ let private idOf (value: obj) : Guid =
     FSharpValue.GetUnionFields(value, value.GetType(), true) |> snd |> Array.head :?> Guid
 
 /// Wide text keeps its spaces. Other text is trimmed.
+let private textToCheck (field: Field) (raw: string) : string =
+    if isWide field.Kind then raw else raw.Trim()
+
 let private textRules (field: Field) (maxLength: int) (raw: string) : string list =
-    let text = if isWide field.Kind then raw else raw.Trim()
+    let text = textToCheck field raw
     if text = "" then [ required ]
     else
         [ if text.Length > maxLength then sprintf "must be %d characters or fewer" maxLength
@@ -60,19 +63,16 @@ let private parseCore (field: Field) (kind: Kind) (raw: string) : Result<obj, st
     let invariant = CultureInfo.InvariantCulture
     match kind with
     | Text _ ->
-        let text = if isWide field.Kind then raw else raw.Trim()
+        let text = textToCheck field raw
         if text = "" then Result.Error required
         elif field.Core = typeof<string> then Ok(box text)
         else Ok(FSharpValue.MakeUnion(FSharpType.GetUnionCases(field.Core, true)[0], [| box text |], true))
     | WholeNumber ->
-        if field.Core = typeof<int64> then
-            match Int64.TryParse(raw.Trim(), NumberStyles.Integer, invariant) with
-            | true, n -> Ok(box n)
-            | _ -> Result.Error "must be a whole number"
-        else
-            match Int32.TryParse(raw.Trim(), NumberStyles.Integer, invariant) with
-            | true, n -> Ok(box n)
-            | _ -> Result.Error "must be a whole number"
+        let isNarrow = field.Core <> typeof<int64>
+        match Int64.TryParse(raw.Trim(), NumberStyles.Integer, invariant) with
+        | true, n when not isNarrow -> Ok(box n)
+        | true, n when n >= int64 Int32.MinValue && n <= int64 Int32.MaxValue -> Ok(box (int n))
+        | _ -> Result.Error "must be a whole number"
     | Date ->
         match DateOnly.TryParseExact(raw.Trim(), "yyyy-MM-dd", invariant, DateTimeStyles.None) with
         | true, d -> Ok(box d)
@@ -93,9 +93,10 @@ let parseField (field: Field) (raw: string option) : Result<obj, FieldError> =
     let fail message = Result.Error { Field = field.Name; Message = message }
     let kind = innerKind field.Kind
     let text = raw |> Option.defaultValue ""
+    let isEmptyInput = textToCheck field text = ""
     if kind = Boolean && raw.IsNone then
         Ok(box false)
-    elif isOptional field.Kind && (not (isWide field.Kind) && text.Trim() = "" || text = "") then
+    elif isOptional field.Kind && isEmptyInput then
         Ok null
     else
         match parseCore field kind text with
