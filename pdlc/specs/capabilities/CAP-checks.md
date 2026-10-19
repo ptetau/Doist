@@ -16,7 +16,7 @@ finding does not. The generator job prints the findings.
 
 ### CAP-checks.R1 · A model with no access rule fails the build
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the model `TodoList` and no access rules. When the checks run, then the findings
   hold the error `MISSING_ACCESS_RULE` with the message "Model TodoList has no access
@@ -29,7 +29,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-checks.R2 · An override that names a missing field fails the build
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 The F# compiler refuses a selector of a field that does not exist. This check covers an
 override set that names a model with no description. It also covers an override item that names a
@@ -44,7 +44,7 @@ field that the plan does not hold.
 
 ### CAP-checks.R3 · An override with config for the wrong type fails the build
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the override `rule <@ fun t -> t.Due @>` whose predicate takes a `string`, when
   the checks run, then the findings hold the error `WRONG_CONFIG_TYPE`. The message
@@ -54,7 +54,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-checks.R4 · An override that targets a system field fails the build
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a `Column` item for the field "Version" of `Todo`. When the checks run, then the
   findings hold the error `SYSTEM_FIELD_TARGET` with the message "Override targets system
@@ -62,7 +62,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-checks.R5 · A reference to a model that does not exist fails the build
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the model `Todo` alone, with its field `List: Ref<TodoList>`. When the checks run,
   then the findings hold the error `DANGLING_REFERENCE` with the message "Field Todo.List
@@ -70,7 +70,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-checks.R6 · A referenced model with no title field fails the build
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a model `NoTitle` with one field `Count: int`, and a model `Child` with the field
   `Parent: Ref<NoTitle>`, and no `titleField` override. When the checks run, then the
@@ -81,7 +81,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-checks.R7 · An `ownedVia` rule must name a reference to its parent
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the access rule `ownedVia <@ fun t -> t.Title @>` for `Todo`. When the checks
   run, then the findings hold the error `WRONG_CONFIG_TYPE` with the message "ownedVia
@@ -92,7 +92,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-checks.R8 · Each `unsafe` escape hatch is a warning that gives its reason
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the override `unsafe "rawName" "uses raw SQL"` for `TodoList`. When the checks
   run, then the findings hold no error, and one warning `UNSAFE_ESCAPE_HATCH` with the message
@@ -100,7 +100,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-checks.R9 · An override that matches the default is a warning
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the override `label <@ fun t -> t.Due @> "Due"` for `Todo`. When the checks run,
   then the findings hold one warning `REDUNDANT_OVERRIDE` with the message "Override
@@ -110,14 +110,14 @@ Status: built · Intents: IN-0001
 
 ### CAP-checks.R10 · The todo app passes every check
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the three models, the three access rules, and the two override sets of the todo
   app. When the checks run, then there are no error findings.
 
 ### CAP-checks.R11 · Two overrides of one kind on one field fail the build
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given two `label` items for the field `Due` of `Todo`. When the checks run, then the
   findings hold the error `WRONG_CONFIG_TYPE` with the message "Todo.Due has two label
@@ -127,7 +127,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-checks.R12 · Findings come in model order, then field order
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the models `TodoList` then `Todo`, each with one error. When the checks run, then
   the `TodoList` finding comes before the `Todo` finding. (assumed)
@@ -135,7 +135,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-checks.R13 · A sort or a view that the store cannot serve fails the build
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 Wide text is never indexed, so a list cannot sort by it. A list view must be a predicate
 that the store can turn into a filter: a bool field, `not` of one, or an equality.
