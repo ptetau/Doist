@@ -163,49 +163,49 @@ none
 
 ## Steps
 
-### Step 1 · Validation returns one error list for each field · [ ]
+### Step 1 · Validation returns one error list for each field · [x]
 
 - Requirement: CAP-validate.R1
 - Check: the checks named `CAP-validate.R1 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R1 (validation returns one error list for each field) passes
 
-### Step 2 · A `Title` is 1 to 200 characters on one line, trimmed · [ ]
+### Step 2 · A `Title` is 1 to 200 characters on one line, trimmed · [x]
 
 - Requirement: CAP-validate.R2
 - Check: the checks named `CAP-validate.R2 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R2 (a `title` is 1 to 200 characters on one line, trimmed) passes
 
-### Step 3 · `Notes` is up to 5,000 characters and can be empty · [ ]
+### Step 3 · `Notes` is up to 5,000 characters and can be empty · [x]
 
 - Requirement: CAP-validate.R3
 - Check: the checks named `CAP-validate.R3 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R3 (`notes` is up to 5,000 characters and can be empty) passes
 
-### Step 4 · A `TimeZoneId` is a known IANA zone · [ ]
+### Step 4 · A `TimeZoneId` is a known IANA zone · [x]
 
 - Requirement: CAP-validate.R4
 - Check: the checks named `CAP-validate.R4 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R4 (a `timezoneid` is a known iana zone) passes
 
-### Step 5 · A reference must point at a record · [ ]
+### Step 5 · A reference must point at a record · [x]
 
 - Requirement: CAP-validate.R5
 - Check: the checks named `CAP-validate.R5 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R5 (a reference must point at a record) passes
 
-### Step 6 · A `rule` override adds its message when its predicate fails · [ ]
+### Step 6 · A `rule` override adds its message when its predicate fails · [x]
 
 - Requirement: CAP-validate.R6
 - Check: the checks named `CAP-validate.R6 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R6 (a `rule` override adds its message when its predicate fails) passes
 
-### Step 7 · An enum value must be a known case · [ ]
+### Step 7 · An enum value must be a known case · [x]
 
 - Requirement: CAP-validate.R7
 - Check: the checks named `CAP-validate.R7 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
 - Done when: every check of CAP-validate.R7 (an enum value must be a known case) passes
 
-### Step 8 · Raw input parses by kind, or gives a field error · [ ]
+### Step 8 · Raw input parses by kind, or gives a field error · [x]
 
 - Requirement: CAP-validate.R8
 - Check: the checks named `CAP-validate.R8 ...` in `tests/Typed.Engine.Tests/CAP-validate.Tests.fs`
@@ -223,6 +223,9 @@ none
   checks fail to compile, because `Typed.Engine.Validate` does not exist yet. Locked at
   7fab997.
 - 2026-10-19T06:15:23+00:00 · Build round 1: the builder found that `knownZone` in the Interface accepted
-  "pacific/auckland" on Linux, so one R4 check failed against correct code. The rule now
+  "pacific/auckland" on Linux, so one CAP-validate.R4 (time zone) check failed against correct code. The rule now
   matches the zone id exactly. The test writer mirrored it. All 87 checks pass with the
   builder's code. Locked again at 6f34681.
+- 2026-10-19T06:16:19+00:00 · Build: the builder wrote `Validate.fs`. All 87 checks pass. The check files did
+  not change after the lock. Commit `9f44a59`. The builder chose the message "cannot be read
+  from text" for a decimal, a timestamp, an id, or a reference, which no line covers.
