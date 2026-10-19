@@ -11,7 +11,7 @@ open Typed.Engine.Generator
 module GenerateFixtures =
 
     /// The time limit for one run of the command, which may build first.
-    let commandLimitMs = 300000
+    let commandLimitMs = 120000
 
     let tempFolder () : string =
         Path.Combine(Path.GetTempPath(), "generate-check-" + Guid.NewGuid().ToString("N"))
@@ -69,7 +69,17 @@ module GenerateFixtures =
         psi.RedirectStandardOutput <- true
         psi.RedirectStandardError <- true
         psi.UseShellExecute <- false
-        for a in [ "run"; "--project"; "src/Typed.Engine.Generator"; "--" ] @ args do
+        // Start the built dll directly. `dotnet run` leaves an MSBuild node that holds the pipes open.
+        let dll = Path.Combine(AppContext.BaseDirectory, "Typed.Engine.Generator.dll")
+        let front =
+            if File.Exists dll then
+                [ dll ]
+            else
+                psi.Environment.["DOTNET_CLI_USE_MSBUILD_SERVER"] <- "0"
+                psi.Environment.["MSBUILDDISABLENODEREUSE"] <- "1"
+                psi.Environment.["DOTNET_CLI_TELEMETRY_OPTOUT"] <- "1"
+                [ "run"; "--project"; "src/Typed.Engine.Generator"; "--" ]
+        for a in front @ args do
             psi.ArgumentList.Add a
         use p = Process.Start psi
         let out = p.StandardOutput.ReadToEndAsync()
