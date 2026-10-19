@@ -1,6 +1,6 @@
 # CH-0001 · Models
 
-Intent: IN-0001 · Scope: CAP-models · Status: building · Ticket: none · Branch: pdlc/CH-0001-models · Base: ccr-1ef8bdfa-1cxxi7
+Intent: IN-0001 · Scope: CAP-models · Status: in review · Ticket: none · Branch: pdlc/CH-0001-models · Base: ccr-1ef8bdfa-1cxxi7
 Tests-Locked: c61b18d
 
 ## Delivers
@@ -237,3 +237,6 @@ none
 - 2026-10-19T05:48:21+00:00 · Build: the builder wrote `Model.fs`, `Overrides.fs`, the project file, and
   `.gitignore`. All 30 checks pass. The check files did not change after the lock. Commit
   `367dc43`.
+- 2026-10-19T05:55:19+00:00 · Verify round 1: 30 of 30 checks pass, one group for each requirement. The
+  check files did not change after the lock. Specification, security, quality, and
+  privacy passed with 0 problems. Compliance does not apply. No follow-up was filed.

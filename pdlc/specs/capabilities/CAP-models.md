@@ -18,7 +18,7 @@ override catalogue.
 
 ### CAP-models.R1 · Each field gets a kind from its type
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 The kinds are text, whole number, decimal, boolean, enum, date, timestamp, id, reference,
 and optional. A field gets its kind from its type. A semantic type gets its kind from a
@@ -42,7 +42,7 @@ default in a list of type defaults. A plain union with no fields is an enum.
 
 ### CAP-models.R2 · A type with no default is an error that names each engine
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 When a field has a type that no default covers, the description fails. The error names
 the model, the field, the type, and each engine.
@@ -56,7 +56,7 @@ the model, the field, the type, and each engine.
 
 ### CAP-models.R3 · The system fields are known and never written from a model
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 The system fields are `Id`, `Owner`, `Version`, `CreatedAt`, and `UpdatedAt`. A model
 does not declare them. The plan knows their names.
@@ -68,7 +68,7 @@ does not declare them. The plan knows their names.
 
 ### CAP-models.R4 · The label comes from the field name
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 The field name is split into words. The first word starts with a capital letter. The other
 words are lower case.
@@ -85,7 +85,7 @@ words are lower case.
 
 ### CAP-models.R5 · Wide text is text longer than 400 characters
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the field `Notes` with the kind optional of text with the length 5000. When a
   caller asks if the field is wide, then the answer is yes.
@@ -98,7 +98,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-models.R6 · The title field is marked or named
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 The title field names a record in pickers and links. The title field is the first field
 whose type carries `[<TitleType>]`. A `titleField` override replaces that choice.
@@ -114,7 +114,7 @@ whose type carries `[<TitleType>]`. A `titleField` override replaces that choice
 
 ### CAP-models.R7 · Overrides take typed field selectors
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 Each override in the catalogue takes a field selector such as `<@ fun t -> t.Due @>`. The
 catalogue is `label`, `hiddenInForm`, `readOnly`, `listColumns`, `listEdit`, `listSort`,
