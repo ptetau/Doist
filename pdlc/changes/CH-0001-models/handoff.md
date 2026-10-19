@@ -1,34 +1,34 @@
-# Handoff · CH-0001 · show → verify
+# Handoff · CH-0001 · verify → user
 
-Time: 2026-10-19T05:53:38+00:00
+Time: 2026-10-19T05:56:36+00:00
 
 ## Done
 
-Recorded `review.gif` with 30 frames in a terminal. Frame 1 builds the engine library.
-Frames 2 to 29 each run `show.fsx` for one acceptance line of CAP-models.R1 (kinds from
-types) to R7 (typed overrides), and print the value, the error code, or the message that
-the line names. Frame 30 runs the 30 checks of CAP-models and shows "Passed! 30". The GIF
-shows 28 of 28 acceptance lines.
+Proposed CH-0001 (models) as draft pull request https://github.com/ptetau/Doist/pull/2,
+against `ccr-1ef8bdfa-1cxxi7`. All 30 checks pass. The four remits that apply passed
+with 0 problems. The seven requirements of CAP-models (model plan) are `verified`. The
+change is `in review`.
 
 ## Decided on defaults
 
-- The show runs `dotnet fsi` on a helper script, one call for each line, because the
-  change is a library with no screen (assumed)
+- none in this stage
 
 ## Open
 
-- none
+- The merge gate waits for CH-0002 (access) to CH-0007 (generate) to be `in review`.
+  The changes of IN-0001 (engine core) merge together, bottom first.
+- Five follow-up intents await approval: IN-0002 (selector error code), IN-0003
+  (acronym labels), IN-0004 (generic type names), IN-0005 (built-in kinds), and
+  IN-0006 (input caps).
 
 ## Look here
 
-- pdlc/changes/CH-0001-models/review.gif and frames/
-- pdlc/changes/CH-0001-models/visual.json and show.fsx
+- https://github.com/ptetau/Doist/pull/2
 
 ## Don't redo
 
-- The recording. Each frame was read. No frame shows an error that the spec did not ask
-  for.
+- The checks, the build, the recording, and the reviews of CH-0001 (models).
 
 ## Next: do this first
 
-Run the checks, then send one packet for each remit to a fresh reviewer.
+Start the tests stage of CH-0002 (access), from the branch `pdlc/CH-0001-models`.
