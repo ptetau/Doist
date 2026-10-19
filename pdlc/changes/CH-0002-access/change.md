@@ -1,6 +1,6 @@
 # CH-0002 · Access
 
-Intent: IN-0001 · Scope: CAP-access · Status: testing · Ticket: none · Branch: pdlc/CH-0002-access · Base: pdlc/CH-0001-models
+Intent: IN-0001 · Scope: CAP-access · Status: building · Ticket: none · Branch: pdlc/CH-0002-access · Base: pdlc/CH-0001-models
 Tests-Locked: da2df15
 
 ## Delivers
@@ -167,3 +167,8 @@ none
   gained the `Record` entry that CAP-access.R4 (read-only refusal) and R5 (owner from
   parent) need. Red: the checks fail to compile, because
   `Typed.Engine.Access` does not exist yet. Locked at da2df15.
+- 2026-10-19T06:01:24+00:00 · Tests review: the first review failed on the packet, not the checks. The packet
+  script diffs exact paths, and the project file entry had a suffix. With a bare path the
+  second review passed with 0 problems. The reviewer listed three extra checks for
+  later: a second parent model in the reason text, a delete of a todo in an archived
+  list, and `ownerFor` with no parent.
