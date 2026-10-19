@@ -14,6 +14,11 @@ module AccessFixtures =
     /// The model has no rule in any list below.
     type Unruled = { Name: string }
 
+    /// A second parent model, to pin the reason rule.
+    type Project = { Code: Title; Closed: bool }
+
+    type Task = { Project: Ref<Project>; Title: Title }
+
     let u1 = Guid.Parse "11111111-1111-1111-1111-111111111111"
     let u2 = Guid.Parse "22222222-2222-2222-2222-222222222222"
 
@@ -183,6 +188,25 @@ module ``CAP-access-R4`` =
     let ``CAP-access.R4 creation of a todo in a live list passes`` () =
         let parent = listRecord u1 "Groceries" false
         okUnit (checkChange rules Create "Todo" (Some parent))
+
+    [<Fact>]
+    let ``CAP-access.R4 the reason comes from the parent model and field`` () =
+        let projectRules =
+            [ rule<Task> (
+                  ownedVia <@ fun (t: Task) -> t.Project @>
+                  |> readOnlyWhenParent <@ fun (p: Project) -> p.Closed @>
+              ) ]
+
+        let parent: Record =
+            { Model = "Project"
+              Id = Guid.NewGuid()
+              Owner = Some u1
+              Version = 1L
+              Values = Map [ "Closed", box true ] }
+
+        let f = errorOf (checkChange projectRules Change "Task" (Some parent))
+        Assert.Equal(ErrorCode.READ_ONLY_RECORD, f.Code)
+        Assert.Equal("This project is closed", f.Message)
 
 module ``CAP-access-R5`` =
 
