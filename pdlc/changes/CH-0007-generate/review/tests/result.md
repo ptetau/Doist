@@ -3,27 +3,29 @@ Result: fail
 Remit: tests
 
 Problems:
-- tests/Typed.Engine.Tests/JOB-generate.Tests.fs:1364 · The check "the command prints each finding line to standard output" calls `run` with a `StringWriter`. It never reads the standard output of the command. A `Program.main` that passes `Console.Error` to `run` passes this check. The todo app prints no finding, so the real-command check cannot see a finding line either. · JOB-generate.R1, line "each finding line goes to standard output", and the remit rule that a check proves a line at the surface that the line names.
+- tests/Typed.Engine.Tests/JOB-generate.Tests.fs:1377-1393 · No check shows that the command sends finding lines to standard output. The todo app has no finding, so the command check reads only the usage line. The finding-line check drives `run` with a StringWriter. A `Program.main` that passes `Console.Error` to `run` passes every check. · JOB-generate.R1 line "each finding line goes to standard output" (a line about the command surface, with no check at that surface)
 
 Wrong versions:
-- JOB-generate.R1 the todo app prints no error line and exits 0 · main returns 0 always, or prints an error line to stdout on the todo app · fails (the exit code and stdout lines are read from the real command)
-- JOB-generate.R1 without the Todo access rule · the message says "has more than one access rule" or the code is wrong · fails (exact line match)
-- JOB-generate.R1 an unsafe override on TodoList · the warning is printed twice, or the message drops the reason · passes for a double print (the title says "one warning" but the check does not count); fails for a dropped reason
-- JOB-generate.R1 frobnicate prints usage and exits 2 · main prints usage to stderr · passes (the check reads stdout + stderr together); a wrong exit code fails
-- JOB-generate.R1 each finding line to standard output · main passes Console.Error to run · passes (the check uses a StringWriter, not the command)
-- JOB-generate.R2 writes schema.sql · the schema holds two tables, or no foreign key, or no index · fails (3 CREATE TABLE, FOREIGN KEY, and INDEX are asserted)
-- JOB-generate.R2 also writes shape.json · shape.json is not written · fails
-- JOB-generate.R2 an error finding leaves schema.sql unwritten · the schema is written before the checks run · fails (the folder holds no schema.sql and exit is 1)
-- JOB-generate.R2 a missing build folder is created · run writes into a folder without creating it · fails (the parent folder does not exist either)
-- JOB-generate.R3 the README gives the generate command · the README gives another command · fails
-- JOB-generate.R3 exit codes 0, 1, and 2 · the README gives only code 1 · fails; a README with "net8.0" on a line holding "error" after the word "exit" could satisfy code 0 · passes (weak match)
-- JOB-generate.R3 the README gives `dotnet test tests/Typed.Engine.Tests` · the README has no test command · fails
-- JOB-generate.R3 the README names --out · the README omits --out · fails
+- JOB-generate.R1 the todo app prints no error line and exits 0 · the command exits 1 on a clean app, or prints an error line · fails (exit code assert, stdout assert)
+- JOB-generate.R1 without the Todo access rule · the message text or the code differs, or the exit code is 0 · fails (exact line, exit 1)
+- JOB-generate.R1 unsafe override · the warning counts as an error and gives exit 1 · fails (exit 0 assert, exact line count of 1)
+- JOB-generate.R1 frobnicate prints usage and exits 2 · exit 1 for an unknown command · fails (exit 2 assert)
+- JOB-generate.R1 usage to standard output not standard error · usage goes to stdout, but `Program.main` passes `Console.Error` to `run` for findings · passes (the problem above)
+- JOB-generate.R1 library entry writes each finding line · findings written as `error: CODE msg` · fails (regex needs `error CODE msg`)
+- JOB-generate.R2 todo app writes schema.sql · schema has all three tables and one foreign key, but only one model has an index · passes (the check needs only one FOREIGN KEY and one INDEX anywhere; minor)
+- JOB-generate.R2 also writes shape.json · the command skips shape.json · fails
+- JOB-generate.R2 error finding leaves schema.sql unwritten · the schema is written before the checks run · fails
+- JOB-generate.R2 missing build folder is created · the code writes without creating the folder · fails (the folder and its parent do not exist)
+- JOB-generate.R3 README gives the generate command · README omits the command · fails
+- JOB-generate.R3 README gives the meaning of exit codes · README line "0: an error was found" · passes (the word "error" appears on the line for 0; the meaning is not read, minor)
+- JOB-generate.R3 README gives the command dotnet test tests/ · README omits the command · fails
+- JOB-generate.R3 README names the --out seam · README omits `--out` · fails
 
 Follow-ups:
 - none
 
 Notes:
-- The exit code 1 and the exit code of the unsafe case are proved through `run`, as the Interface seam allows. No check proves that `Program.main` returns the exit code of `run`. A `main` that ignores it passes the exit-1 checks. The one real-command check with exit 0 cannot catch it. Consider one real-command check with a failing config if the Interface adds a seam for it.
-- The exit code matching in the README check scans every line after the first "exit" line and takes the first line that holds the digit. It can match an unrelated line.
-- The default folder `build/` is not tested. No acceptance line asks for it beyond the assumed "no build/ folder" line, which the check proves with `--out` style config.
+- The command checks use a 300000 ms limit, so none can hang.
+- No line depends on the clock.
+- R1 lines 2 and 3 and R2 line 2 use `Generator.run` with a changed `Config`. The Interface names this seam for those lines. The exit code mapping in `Program.main` for exit 1 is not checked through the command.
+- The only error code the change spec names is `MISSING_ACCESS_RULE`, and one check expects that exact code.
