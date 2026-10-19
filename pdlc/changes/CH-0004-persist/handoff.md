@@ -1,31 +1,30 @@
-# Handoff · CH-0004 · verify → show
+# Handoff · CH-0004 · show → verify
 
-Time: 2026-10-19T06:56:21+00:00
+Time: 2026-10-19T06:58:56+00:00
 
 ## Done
 
-Verify round 1. All 139 checks pass. Security, quality, and privacy passed. Specification
-failed on one point: the caption of frame 40 said "49 checks" and the frame showed 51
-runs, because one check is a Theory with four rows. The caption now says "49 checks, 51
-runs". Filed IN-0011 (store fails closed), IN-0012 (listQuery finding), IN-0013 (cursor
-privacy), and IN-0014 (persist tidy) from the follow-ups.
+Recorded `review.gif` again with 40 frames. The only change is the caption of frame 40,
+which now says "49 checks, 51 runs" and matches the frame. Frames 2 to 39 each run
+`show.fsx` for one acceptance line of CAP-persist.R1 (tables) to R8 (migration drop).
+The GIF shows 38 of 38 acceptance lines.
 
 ## Decided on defaults
 
-- none
+- none in this stage
 
 ## Open
 
-- Record `visual.json` again with the corrected caption. Nothing else changed.
+- none
 
 ## Look here
 
-- pdlc/changes/CH-0004-persist/visual.json
+- pdlc/changes/CH-0004-persist/review.gif and frames/
 
 ## Don't redo
 
-- The checks, the build, and the reviews that passed.
+- The recording. Frame 40 was read after the new recording.
 
 ## Next: do this first
 
-Record again, then verify, round 2.
+Verify, round 2.

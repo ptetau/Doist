@@ -4,7 +4,7 @@ Status: new · Ticket: none · Branch: none · Added: 2026-10-19
 
 ## What and why
 
-Remove the unused opens in `Persist.fs` (`System.Data`, `Microsoft.FSharp.Reflection`, `Microsoft.FSharp.Quotations`), and the repeated "first error of two results" match in `comparison` and `combine`.
+Remove the unused opens in `Persist.fs`: `System.Data`, `Microsoft.FSharp.Reflection`, and `Microsoft.FSharp.Quotations`. Also remove the repeated "first error of two results" match in `comparison` and `combine`.
 
 ## Requirements
 
