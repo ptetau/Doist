@@ -87,6 +87,9 @@ The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requi
 ### Test seams
 
 - clock and time zone: `HookContext.Now` and `HookContext.TimeZone`. The checks build the context by hand.
+- `HookContext` is in `Typed.Engine.Model`: `{ User: Guid; TimeZone: TimeZoneInfo; Now: DateTimeOffset }`. Build it with a record expression.
+- `Ref<'T>` is the case `Ref of Guid`, in `Typed.Engine.Model`. Write `Ref (Guid.NewGuid())`.
+- `Typed.Engine.Model.localToday ctx` gives the date of `ctx.Now` in `ctx.TimeZone`.
 
 ## Files
 
