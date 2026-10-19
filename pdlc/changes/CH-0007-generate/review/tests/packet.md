@@ -61,8 +61,8 @@ Look for these traps:
 ````
 # CH-0007 · Generate
 
-Intent: IN-0001 · Scope: JOB-generate · Status: testing · Ticket: none · Branch: pdlc/CH-0007-generate · Base: pdlc/CH-0006-todo-app
-Tests-Locked: 73696e56bcbcd9cd662381e5f98f0597324e1fb2
+Intent: IN-0001 · Scope: JOB-generate · Status: building · Ticket: none · Branch: pdlc/CH-0007-generate · Base: pdlc/CH-0006-todo-app
+Tests-Locked: 17b1275323714dd91de1497c6b2c520b5cff3f7c
 
 ## Delivers
 
@@ -183,6 +183,7 @@ none
 ## Progress log
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `JOB-generate` as the ready stage left them.
+- Sent back to tests: the checks hung on dotnet run. They now start the built dll.
 ````
 
 ## The spec it covers: title and summary
@@ -1043,10 +1044,10 @@ naming must be simple and the same everywhere.
 ````
 diff --git a/tests/Typed.Engine.Tests/JOB-generate.Tests.fs b/tests/Typed.Engine.Tests/JOB-generate.Tests.fs
 new file mode 100644
-index 0000000..0e9286a
+index 0000000..166f2cf
 --- /dev/null
 +++ b/tests/Typed.Engine.Tests/JOB-generate.Tests.fs
-@@ -0,0 +1,218 @@
+@@ -0,0 +1,228 @@
 +namespace Typed.Engine.Tests
 +
 +open System
@@ -1060,7 +1061,7 @@ index 0000000..0e9286a
 +module GenerateFixtures =
 +
 +    /// The time limit for one run of the command, which may build first.
-+    let commandLimitMs = 300000
++    let commandLimitMs = 120000
 +
 +    let tempFolder () : string =
 +        Path.Combine(Path.GetTempPath(), "generate-check-" + Guid.NewGuid().ToString("N"))
@@ -1118,7 +1119,17 @@ index 0000000..0e9286a
 +        psi.RedirectStandardOutput <- true
 +        psi.RedirectStandardError <- true
 +        psi.UseShellExecute <- false
-+        for a in [ "run"; "--project"; "src/Typed.Engine.Generator"; "--" ] @ args do
++        // Start the built dll directly. `dotnet run` leaves an MSBuild node that holds the pipes open.
++        let dll = Path.Combine(AppContext.BaseDirectory, "Typed.Engine.Generator.dll")
++        let front =
++            if File.Exists dll then
++                [ dll ]
++            else
++                psi.Environment.["DOTNET_CLI_USE_MSBUILD_SERVER"] <- "0"
++                psi.Environment.["MSBUILDDISABLENODEREUSE"] <- "1"
++                psi.Environment.["DOTNET_CLI_TELEMETRY_OPTOUT"] <- "1"
++                [ "run"; "--project"; "src/Typed.Engine.Generator"; "--" ]
++        for a in front @ args do
 +            psi.ArgumentList.Add a
 +        use p = Process.Start psi
 +        let out = p.StandardOutput.ReadToEndAsync()
@@ -1303,7 +1314,7 @@ open Typed.Engine.Generator
 module GenerateFixtures =
 
     /// The time limit for one run of the command, which may build first.
-    let commandLimitMs = 300000
+    let commandLimitMs = 120000
 
     let tempFolder () : string =
         Path.Combine(Path.GetTempPath(), "generate-check-" + Guid.NewGuid().ToString("N"))
@@ -1361,7 +1372,17 @@ module GenerateFixtures =
         psi.RedirectStandardOutput <- true
         psi.RedirectStandardError <- true
         psi.UseShellExecute <- false
-        for a in [ "run"; "--project"; "src/Typed.Engine.Generator"; "--" ] @ args do
+        // Start the built dll directly. `dotnet run` leaves an MSBuild node that holds the pipes open.
+        let dll = Path.Combine(AppContext.BaseDirectory, "Typed.Engine.Generator.dll")
+        let front =
+            if File.Exists dll then
+                [ dll ]
+            else
+                psi.Environment.["DOTNET_CLI_USE_MSBUILD_SERVER"] <- "0"
+                psi.Environment.["MSBUILDDISABLENODEREUSE"] <- "1"
+                psi.Environment.["DOTNET_CLI_TELEMETRY_OPTOUT"] <- "1"
+                [ "run"; "--project"; "src/Typed.Engine.Generator"; "--" ]
+        for a in front @ args do
             psi.ArgumentList.Add a
         use p = Process.Start psi
         let out = p.StandardOutput.ReadToEndAsync()
