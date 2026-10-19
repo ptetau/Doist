@@ -17,10 +17,13 @@ This section gives the command that runs the checks of this project, and the com
 runs only the checks for one requirement. Init writes this section. A project with no
 checks yet keeps its checks in `tests/`.
 
-- all: none
-- one requirement: none
+- all: `dotnet test tests/Typed.Engine.Tests`
+- one requirement: `dotnet test tests/Typed.Engine.Tests --filter "DisplayName~{req}"`
 - check folders: `tests/`
 - ID form in check names: `dotted`
+
+The checks run in this sandbox and in CI. The web, sign-in, and security stages need SQL
+Server and a sign-in provider. `DES-test-database` tells when each stage can run.
 
 ## Reviews
 
