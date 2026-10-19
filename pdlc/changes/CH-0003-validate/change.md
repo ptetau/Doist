@@ -229,3 +229,7 @@ none
 - 2026-10-19T06:16:19+00:00 · Build: the builder wrote `Validate.fs`. All 87 checks pass. The check files did
   not change after the lock. Commit `9f44a59`. The builder chose the message "cannot be read
   from text" for a decimal, a timestamp, an id, or a reference, which no line covers.
+- 2026-10-19T06:21:54+00:00 · Verify round 1 failed. Quality named three repeats in `Validate.fs`. Sent back to
+  the build stage. Specification named one long sentence, now split. Filed IN-0008
+  (parse messages for all kinds), IN-0009 (parseField length), and IN-0010 (validate
+  never raises).

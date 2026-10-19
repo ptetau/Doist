@@ -1,33 +1,43 @@
-# Handoff · CH-0003 · show → verify
+# Handoff · CH-0003 · verify → build
 
-Time: 2026-10-19T06:19:44+00:00
+Time: 2026-10-19T06:21:54+00:00
 
 ## Done
 
-Recorded `review.gif` with 32 frames in a terminal. Frame 1 builds the library. Frames 2
-to 31 each run `show.fsx` for one acceptance line of CAP-validate.R1 (errors for each
-field) to R8 (raw input by kind), and print the error list or the parsed value. Frame 32
-runs the 32 checks of CAP-validate and shows "Passed! 32". The GIF shows 30 of 30
-acceptance lines.
+Verify round 1. All 87 checks pass. Security and privacy passed. Specification failed on
+one long sentence in the change spec, which is now split. Quality failed on three points
+in `src/Typed.Engine/Validate.fs`. The three points go to the build stage. No acceptance
+line changes.
 
 ## Decided on defaults
 
-- none in this stage
+- none
 
 ## Open
 
-- none
+Fix these three points in `src/Typed.Engine/Validate.fs`, with no new behaviour and no
+change to the checks:
+
+1. The `WholeNumber` branch of `parseCore` holds two copies of the same parse and the
+   same message, one for `int64` and one for `int`. Keep one parse, and pick the
+   width in one place.
+2. The rule "wide text keeps its spaces, other text is trimmed" appears in `textRules`
+   and again in `parseCore`. Write it one time, in one private function, and call it
+   from both.
+3. The empty-optional test in `parseField`, `not (isWide field.Kind) && text.Trim() = ""
+   || text = ""`, repeats the trim rule a third time and relies on operator precedence.
+   Use the one function from point 2, and name the test.
 
 ## Look here
 
-- pdlc/changes/CH-0003-validate/review.gif and frames/
-- pdlc/changes/CH-0003-validate/visual.json and show.fsx
+- pdlc/changes/CH-0003-validate/review/quality/result.md
+- src/Typed.Engine/Validate.fs
 
 ## Don't redo
 
-- The recording. Each frame was read. No frame shows an error that the spec did not ask
-  for.
+- The checks. They are locked at `6f34681`. All 87 pass and must still pass.
+- The recording. The show stage records again after the build.
 
 ## Next: do this first
 
-Run the checks, then send one packet for each remit to a fresh reviewer.
+Make the three changes above, then run `dotnet test tests/Typed.Engine.Tests`.
