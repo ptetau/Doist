@@ -1,6 +1,6 @@
 # CH-0007 · Generate
 
-Intent: IN-0001 · Scope: JOB-generate · Status: planned · Ticket: none · Branch: none · Base: main
+Intent: IN-0001 · Scope: JOB-generate · Status: testing · Ticket: none · Branch: pdlc/CH-0007-generate · Base: pdlc/CH-0006-todo-app
 Tests-Locked: none
 
 ## Delivers
