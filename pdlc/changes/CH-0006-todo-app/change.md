@@ -1,7 +1,7 @@
 # CH-0006 · Todo app
 
-Intent: IN-0001 · Scope: CAP-todo-app · Status: planned · Ticket: none · Branch: none · Base: main
-Tests-Locked: none
+Intent: IN-0001 · Scope: CAP-todo-app · Status: in review · Ticket: none · Branch: pdlc/CH-0006-todo-app · Base: pdlc/CH-0005-checks
+Tests-Locked: 3e52d322a80fce1c8d63131adbf5daa3d79f81c2
 
 ## Delivers
 
@@ -87,6 +87,9 @@ The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requi
 ### Test seams
 
 - clock and time zone: `HookContext.Now` and `HookContext.TimeZone`. The checks build the context by hand.
+- `HookContext` is in `Typed.Engine.Model`: `{ User: Guid; TimeZone: TimeZoneInfo; Now: DateTimeOffset }`. Build it with a record expression.
+- `Ref<'T>` is the case `Ref of Guid`, in `Typed.Engine.Model`. Write `Ref (Guid.NewGuid())`.
+- `Typed.Engine.Model.localToday ctx` gives the date of `ctx.Now` in `ctx.TimeZone`.
 
 ## Files
 
@@ -146,3 +149,6 @@ none
 ## Progress log
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-todo-app` as the ready stage left them.
+- Sent back to tests: two R3 (overrides) checks compare OverrideItem values that hold a quotation or function, so equality is by reference.
+- Built: 206 checks pass (22 new). Tests were re-locked three times for weak checks.
+- Verified: all remits pass. Filed IN-0016 (Title and TimeZoneId checks) as a follow-up.

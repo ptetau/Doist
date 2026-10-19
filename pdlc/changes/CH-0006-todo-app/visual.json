@@ -1,0 +1,70 @@
+{
+  "kind": "terminal",
+  "title": "CH-0006 \u00b7 Todo app",
+  "steps": [
+    {
+      "caption": "CH-0006 \u00b7 Build the todo app",
+      "run": "dotnet build src/Todo.App/Todo.App.fsproj --nologo -v q"
+    },
+    {
+      "caption": "CAP-todo-app.R1 \u00b7 The engine describes User, TodoList, Todo with their fields",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R1.1"
+    },
+    {
+      "caption": "CAP-todo-app.R1 \u00b7 Type defaults: Title 200, Notes 5000, TimeZoneId 64, ExternalId 255 hidden unique",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R1.2"
+    },
+    {
+      "caption": "CAP-todo-app.R2 \u00b7 Access: User self, TodoList owned, Todo ownedVia List",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R2.1"
+    },
+    {
+      "caption": "CAP-todo-app.R3 \u00b7 Todo overrides: readOnly, listEdit, listSort, listColumns",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R3.1"
+    },
+    {
+      "caption": "CAP-todo-app.R3 \u00b7 TodoList views: Active, then Archived",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R3.2"
+    },
+    {
+      "caption": "CAP-todo-app.R4 \u00b7 Ticking a todo sets CompletedAt",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R4.1"
+    },
+    {
+      "caption": "CAP-todo-app.R4 \u00b7 Unticking a todo clears CompletedAt",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R4.2"
+    },
+    {
+      "caption": "CAP-todo-app.R4 \u00b7 Saving a done todo again keeps CompletedAt",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R4.3"
+    },
+    {
+      "caption": "CAP-todo-app.R5 \u00b7 Open todo due today in Auckland: overdue",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R5.1"
+    },
+    {
+      "caption": "CAP-todo-app.R5 \u00b7 Done todo due today: not overdue",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R5.2"
+    },
+    {
+      "caption": "CAP-todo-app.R5 \u00b7 Open todo due tomorrow: not overdue",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R5.3"
+    },
+    {
+      "caption": "CAP-todo-app.R5 \u00b7 Todo with no due date: not overdue",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R5.4"
+    },
+    {
+      "caption": "CAP-todo-app.R6 \u00b7 The app has four source files and no other",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R6.1"
+    },
+    {
+      "caption": "CAP-todo-app.R6 \u00b7 Engine checks over the app: no findings",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0006-todo-app/show.fsx R6.2"
+    },
+    {
+      "caption": "CH-0006 \u00b7 All checks pass",
+      "run": "dotnet test tests/Typed.Engine.Tests --nologo -v q"
+    }
+  ]
+}

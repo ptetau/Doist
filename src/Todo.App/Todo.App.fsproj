@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Model.fs" />
+    <Compile Include="Defaults.fs" />
+    <Compile Include="Schema.fs" />
+    <Compile Include="Hooks.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Typed.Engine/Typed.Engine.fsproj" />
+  </ItemGroup>
+
+</Project>

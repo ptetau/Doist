@@ -20,7 +20,7 @@ parts.
 
 ### CAP-todo-app.R1 · The three models and five semantic types of the spec
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the todo app, when the engine describes its models, then the models are `User`,
   `TodoList`, and `Todo`, with the fields of the spec.
@@ -30,7 +30,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-todo-app.R2 · The three access rules of the spec
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the todo app. When a caller reads its access rules, then `User` is `self`,
   `TodoList` is `owned`, and `Todo` is `ownedVia List`, read-only when the list is
@@ -38,7 +38,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-todo-app.R3 · The overrides of the spec
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the todo app, when a caller reads the overrides of `Todo`, then they are
   `readOnly CompletedAt`, `listEdit Done`, `listSort Due Ascending`, and `listColumns
@@ -48,7 +48,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-todo-app.R4 · Ticking a todo sets its completion time
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 The hook runs before the save. If `Done` changed to true, `CompletedAt` is now. If `Done`
 changed to false, `CompletedAt` is empty. If `Done` did not change, `CompletedAt` keeps
@@ -64,7 +64,7 @@ its value.
 
 ### CAP-todo-app.R5 · A todo is overdue by the user's calendar
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 A todo is overdue when `Due` is before today in the user's time zone, and `Done` is
 false.
@@ -80,7 +80,7 @@ false.
 
 ### CAP-todo-app.R6 · The app has no other code
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the app project, when a caller lists its source files, then the files are
   `Model.fs`, `Defaults.fs`, `Schema.fs`, and `Hooks.fs`, and no other `.fs` file.
