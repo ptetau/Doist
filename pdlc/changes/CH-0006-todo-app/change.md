@@ -149,3 +149,4 @@ none
 ## Progress log
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-todo-app` as the ready stage left them.
+- Sent back to tests: two R3 checks compare OverrideItem values that hold a quotation or function, so equality is by reference.
