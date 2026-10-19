@@ -61,8 +61,8 @@ Look for these traps:
 ````
 # CH-0006 · Todo app
 
-Intent: IN-0001 · Scope: CAP-todo-app · Status: testing · Ticket: none · Branch: pdlc/CH-0006-todo-app · Base: pdlc/CH-0005-checks
-Tests-Locked: 9c3951347ac1bdee08445c497dbd1013a9aed668
+Intent: IN-0001 · Scope: CAP-todo-app · Status: building · Ticket: none · Branch: pdlc/CH-0006-todo-app · Base: pdlc/CH-0005-checks
+Tests-Locked: f558c7c075ecf41f9bb39b5328492d0b9b8c9dc9
 
 ## Delivers
 
@@ -210,6 +210,7 @@ none
 ## Progress log
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-todo-app` as the ready stage left them.
+- Sent back to tests: two R3 checks compare OverrideItem values that hold a quotation or function, so equality is by reference.
 ````
 
 ## The spec it covers: title and summary
@@ -817,10 +818,10 @@ naming must be simple and the same everywhere.
 ````
 diff --git a/tests/Typed.Engine.Tests/CAP-todo-app.Tests.fs b/tests/Typed.Engine.Tests/CAP-todo-app.Tests.fs
 new file mode 100644
-index 0000000..1b89d4c
+index 0000000..b49e154
 --- /dev/null
 +++ b/tests/Typed.Engine.Tests/CAP-todo-app.Tests.fs
-@@ -0,0 +1,311 @@
+@@ -0,0 +1,332 @@
 +namespace Typed.Engine.Tests
 +
 +open System
@@ -858,25 +859,6 @@ index 0000000..1b89d4c
 +
 +    let setFor (name: string) : ModelOverrides =
 +        AppSchema.overrideSets |> List.find (fun s -> s.ModelName = name)
-+
-+    /// Builders for the expected items. They use the same builders as the spec.
-+    let expectedTodoItems: OverrideItem list =
-+        (overrides<Todo>
-+            [ readOnly <@ fun (t: Todo) -> t.CompletedAt @>
-+              listEdit <@ fun (t: Todo) -> t.Done @>
-+              listSort <@ fun (t: Todo) -> t.Due @> Ascending
-+              listColumns
-+                  [ col <@ fun (t: Todo) -> t.Title @>
-+                    col <@ fun (t: Todo) -> t.Due @>
-+                    col <@ fun (t: Todo) -> t.Priority @>
-+                    col <@ fun (t: Todo) -> t.Done @> ] ])
-+            .Items
-+
-+    let expectedListItems: OverrideItem list =
-+        (overrides<TodoList>
-+            [ listView "Active" <@ fun (l: TodoList) -> not l.Archived @>
-+              listView "Archived" <@ fun (l: TodoList) -> l.Archived @> ])
-+            .Items
 +
 +open TodoAppFixtures
 +
@@ -980,8 +962,32 @@ index 0000000..1b89d4c
 +    let ``CAP-todo-app.R3 the overrides of Todo are the four of the spec`` () =
 +        let items = (setFor "Todo").Items
 +        Assert.Equal(4, items.Length)
-+        for expected in expectedTodoItems do
-+            Assert.Contains(expected, items)
++        // Compare names, directions, and column lists. Never compare OverrideItem values: they hold quotations.
++        let sorts =
++            items
++            |> List.choose (fun i ->
++                match i with
++                | ListSort(f, d) -> Some(f, d)
++                | _ -> None)
++        Assert.Equal<(string * Direction) list>([ ("Due", Ascending) ], sorts)
++        let columns =
++            items
++            |> List.choose (fun i ->
++                match i with
++                | ListColumns fs -> Some fs
++                | _ -> None)
++        Assert.Equal<string list list>([ [ "Title"; "Due"; "Priority"; "Done" ] ], columns)
++        // The two other items are readOnly CompletedAt, then listEdit Done. They are different kinds of item.
++        let others =
++            items
++            |> List.filter (fun i ->
++                match i with
++                | ListSort _
++                | ListColumns _ -> false
++                | _ -> true)
++        Assert.Equal<string list list>([ [ "CompletedAt" ]; [ "Done" ] ], others |> List.map fieldsOf)
++        let kind (i: OverrideItem) = (sprintf "%A" i).Split([| ' '; '('; '\n' |]).[0]
++        Assert.NotEqual<string>(kind others.[0], kind others.[1])
 +
 +    [<Fact>]
 +    let ``CAP-todo-app.R3 listSort of Todo is Due ascending`` () =
@@ -1022,8 +1028,24 @@ index 0000000..1b89d4c
 +
 +    [<Fact>]
 +    let ``CAP-todo-app.R3 the Active view is not Archived and the Archived view is Archived`` () =
-+        let items = (setFor "TodoList").Items
-+        Assert.Equal<OverrideItem list>(expectedListItems, items)
++        let views =
++            (setFor "TodoList").Items
++            |> List.map (fun i ->
++                match i with
++                | ListView(n, q) -> n, (sprintf "%A" q)
++                | other -> failwithf "Expected a view, got %A" other)
++        let (activeName, activeText), (archivedName, archivedText) =
++            match views with
++            | [ a; b ] -> a, b
++            | other -> failwithf "Expected two views, got %d" other.Length
++        Assert.Equal("Active", activeName)
++        Assert.Equal("Archived", archivedName)
++        // Both views read only Archived. The Active quotation also applies not, the Archived one does not.
++        Assert.Contains("Archived", activeText)
++        Assert.Contains("Archived", archivedText)
++        Assert.Contains("Not", activeText)
++        Assert.DoesNotContain("Not", archivedText)
++        Assert.NotEqual<string>(activeText, archivedText)
 +
 +module HookFixtures =
 +
@@ -1195,25 +1217,6 @@ module TodoAppFixtures =
     let setFor (name: string) : ModelOverrides =
         AppSchema.overrideSets |> List.find (fun s -> s.ModelName = name)
 
-    /// Builders for the expected items. They use the same builders as the spec.
-    let expectedTodoItems: OverrideItem list =
-        (overrides<Todo>
-            [ readOnly <@ fun (t: Todo) -> t.CompletedAt @>
-              listEdit <@ fun (t: Todo) -> t.Done @>
-              listSort <@ fun (t: Todo) -> t.Due @> Ascending
-              listColumns
-                  [ col <@ fun (t: Todo) -> t.Title @>
-                    col <@ fun (t: Todo) -> t.Due @>
-                    col <@ fun (t: Todo) -> t.Priority @>
-                    col <@ fun (t: Todo) -> t.Done @> ] ])
-            .Items
-
-    let expectedListItems: OverrideItem list =
-        (overrides<TodoList>
-            [ listView "Active" <@ fun (l: TodoList) -> not l.Archived @>
-              listView "Archived" <@ fun (l: TodoList) -> l.Archived @> ])
-            .Items
-
 open TodoAppFixtures
 
 module ``CAP-todo-app-R1`` =
@@ -1316,8 +1319,32 @@ module ``CAP-todo-app-R3`` =
     let ``CAP-todo-app.R3 the overrides of Todo are the four of the spec`` () =
         let items = (setFor "Todo").Items
         Assert.Equal(4, items.Length)
-        for expected in expectedTodoItems do
-            Assert.Contains(expected, items)
+        // Compare names, directions, and column lists. Never compare OverrideItem values: they hold quotations.
+        let sorts =
+            items
+            |> List.choose (fun i ->
+                match i with
+                | ListSort(f, d) -> Some(f, d)
+                | _ -> None)
+        Assert.Equal<(string * Direction) list>([ ("Due", Ascending) ], sorts)
+        let columns =
+            items
+            |> List.choose (fun i ->
+                match i with
+                | ListColumns fs -> Some fs
+                | _ -> None)
+        Assert.Equal<string list list>([ [ "Title"; "Due"; "Priority"; "Done" ] ], columns)
+        // The two other items are readOnly CompletedAt, then listEdit Done. They are different kinds of item.
+        let others =
+            items
+            |> List.filter (fun i ->
+                match i with
+                | ListSort _
+                | ListColumns _ -> false
+                | _ -> true)
+        Assert.Equal<string list list>([ [ "CompletedAt" ]; [ "Done" ] ], others |> List.map fieldsOf)
+        let kind (i: OverrideItem) = (sprintf "%A" i).Split([| ' '; '('; '\n' |]).[0]
+        Assert.NotEqual<string>(kind others.[0], kind others.[1])
 
     [<Fact>]
     let ``CAP-todo-app.R3 listSort of Todo is Due ascending`` () =
@@ -1358,8 +1385,24 @@ module ``CAP-todo-app-R3`` =
 
     [<Fact>]
     let ``CAP-todo-app.R3 the Active view is not Archived and the Archived view is Archived`` () =
-        let items = (setFor "TodoList").Items
-        Assert.Equal<OverrideItem list>(expectedListItems, items)
+        let views =
+            (setFor "TodoList").Items
+            |> List.map (fun i ->
+                match i with
+                | ListView(n, q) -> n, (sprintf "%A" q)
+                | other -> failwithf "Expected a view, got %A" other)
+        let (activeName, activeText), (archivedName, archivedText) =
+            match views with
+            | [ a; b ] -> a, b
+            | other -> failwithf "Expected two views, got %d" other.Length
+        Assert.Equal("Active", activeName)
+        Assert.Equal("Archived", archivedName)
+        // Both views read only Archived. The Active quotation also applies not, the Archived one does not.
+        Assert.Contains("Archived", activeText)
+        Assert.Contains("Archived", archivedText)
+        Assert.Contains("Not", activeText)
+        Assert.DoesNotContain("Not", archivedText)
+        Assert.NotEqual<string>(activeText, archivedText)
 
 module HookFixtures =
 
