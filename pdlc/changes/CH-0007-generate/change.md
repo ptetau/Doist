@@ -1,7 +1,7 @@
 # CH-0007 · Generate
 
 Intent: IN-0001 · Scope: JOB-generate · Status: building · Ticket: none · Branch: pdlc/CH-0007-generate · Base: pdlc/CH-0006-todo-app
-Tests-Locked: 73696e56bcbcd9cd662381e5f98f0597324e1fb2
+Tests-Locked: 17b1275323714dd91de1497c6b2c520b5cff3f7c
 
 ## Delivers
 
@@ -122,3 +122,4 @@ none
 ## Progress log
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `JOB-generate` as the ready stage left them.
+- Sent back to tests: the checks hung on dotnet run. They now start the built dll.
