@@ -76,7 +76,7 @@ module ModelsFixtures =
 
 open ModelsFixtures
 
-module ``CAP-models.R1`` =
+module ``CAP-models-R1`` =
 
     [<Fact>]
     let ``CAP-models.R1 Title has kind text 200`` () =
@@ -116,7 +116,7 @@ module ``CAP-models.R1`` =
         Assert.Equal(ErrorCode.WRONG_CONFIG_TYPE, fs.Head.Code)
         Assert.Equal("Priority is not a record type.", fs.Head.Message)
 
-module ``CAP-models.R2`` =
+module ``CAP-models-R2`` =
 
     [<Fact>]
     let ``CAP-models.R2 a list of Title has no default and names each engine`` () =
@@ -139,7 +139,7 @@ module ``CAP-models.R2`` =
         let names = fs |> List.map (fun f -> f.Field) |> List.sort
         Assert.Equal<string option list>([ Some "Aliases"; Some "Tags" ], names)
 
-module ``CAP-models.R3`` =
+module ``CAP-models-R3`` =
 
     [<Fact>]
     let ``CAP-models.R3 the system field names are known`` () =
@@ -156,7 +156,7 @@ module ``CAP-models.R3`` =
         for s in systemFields do
             Assert.DoesNotContain(s, names)
 
-module ``CAP-models.R4`` =
+module ``CAP-models-R4`` =
 
     [<Fact>]
     let ``CAP-models.R4 CompletedAt gives Completed at`` () =
@@ -182,7 +182,7 @@ module ``CAP-models.R4`` =
         let m = describeOk typeof<Todo>
         Assert.Equal("Completed at", (field m "CompletedAt").Label)
 
-module ``CAP-models.R5`` =
+module ``CAP-models-R5`` =
 
     [<Fact>]
     let ``CAP-models.R5 Notes is wide`` () =
@@ -206,7 +206,7 @@ module ``CAP-models.R5`` =
     let ``CAP-models.R5 a whole number is not wide`` () =
         Assert.False(isWide WholeNumber)
 
-module ``CAP-models.R6`` =
+module ``CAP-models-R6`` =
 
     let private titleOf (t: Type) (items: OverrideItem list) =
         let m = describeOk t
@@ -229,7 +229,7 @@ module ``CAP-models.R6`` =
         let mo = overrides<NoTitle> [ titleField <@ fun (n: NoTitle) -> n.Count @> ]
         Assert.Equal(Some "Count", titleOf typeof<NoTitle> mo.Items)
 
-module ``CAP-models.R7`` =
+module ``CAP-models-R7`` =
 
     [<Fact>]
     let ``CAP-models.R7 the selector for Due reads the name Due`` () =
