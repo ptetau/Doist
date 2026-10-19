@@ -5,12 +5,12 @@ Remit: security
 Problems: none
 
 Follow-ups:
-- `parseField` does not check the text length. `validate` does. A caller that stores the parsed value without calling `validate` could keep over-long text. A new intent could make `parseField` give the length error, or could state that every write path calls `validate`.
-- `validate` raises on a null string in a non-optional text field. `textOf` reads a null as a union and throws. The spec says no function raises. A new intent could return a "is required" error for a null value.
-- A `rule` predicate that raises is not caught. A new intent could turn that into a field error.
+- `parseField` does not check the length of a text value. A caller who parses raw input and skips `validate` can get a text value longer than the kind allows. A new intent could add the length check to `parseField`. IN-0009 (parseField length) already covers this.
+- `validate` and `parseField` can raise on malformed input. Examples are a null record, a throwing `rule` predicate, or a `Text` field with a type that is not a union. A new intent could return these cases as errors. IN-0010 (validate never raises) already covers this.
 
 Notes:
-- No command, query, path, or HTML is built from input. The messages never include the raw value, so nothing leaks through errors.
-- Parsing uses the invariant culture and exact formats. A kind with no text form gives "cannot be read from text", so it fails closed.
-- Enum parsing matches a known case name exactly, so an unknown value cannot create a union value.
-- The change adds no dependency.
+- The code builds no command, query, path, or HTML. Reflection works only on types from the model, never on names from input.
+- Error messages are fixed text. The enum message lists the model's cases and does not echo the raw input.
+- No secrets, no new dependency.
+- Parsing uses the invariant culture and exact formats, so the result does not depend on the host locale.
+- The time zone rule uses an exact id match. It does not call `FindSystemTimeZoneById`.

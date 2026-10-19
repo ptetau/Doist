@@ -243,12 +243,18 @@ none
   checks fail to compile, because `Typed.Engine.Validate` does not exist yet. Locked at
   7fab997.
 - 2026-10-19T06:15:23+00:00 · Build round 1: the builder found that `knownZone` in the Interface accepted
-  "pacific/auckland" on Linux, so one CAP-validate.R4 (time zone) check failed against correct code. The rule now
+  "pacific/auckland" on Linux. One CAP-validate.R4 (time zone) check failed against correct code. The rule now
   matches the zone id exactly. The test writer mirrored it. All 87 checks pass with the
   builder's code. Locked again at 6f34681.
 - 2026-10-19T06:16:19+00:00 · Build: the builder wrote `Validate.fs`. All 87 checks pass. The check files did
   not change after the lock. Commit `9f44a59`. The builder chose the message "cannot be read
   from text" for a decimal, a timestamp, an id, or a reference, which no line covers.
+- 2026-10-19T06:21:54+00:00 · Verify round 1 failed. Quality named three repeats in `Validate.fs`. Sent back to
+  the build stage. Specification named one long sentence, now split. Filed IN-0008
+  (parse messages for all kinds), IN-0009 (parseField length), and IN-0010 (validate
+  never raises).
+- 2026-10-19T06:23:16+00:00 · Build round 2: the builder removed the three repeats that quality named. All 87
+  checks pass. The check files did not change after the lock. Commit `40d743a`.
 ````
 
 ## The spec it covers: title and summary
@@ -665,10 +671,10 @@ index a7db7c4..e1167bf 100644
  </Project>
 diff --git a/src/Typed.Engine/Validate.fs b/src/Typed.Engine/Validate.fs
 new file mode 100644
-index 0000000..9dc9642
+index 0000000..df1a238
 --- /dev/null
 +++ b/src/Typed.Engine/Validate.fs
-@@ -0,0 +1,106 @@
+@@ -0,0 +1,107 @@
 +module Typed.Engine.Validate
 +
 +open System
@@ -696,8 +702,11 @@ index 0000000..9dc9642
 +    FSharpValue.GetUnionFields(value, value.GetType(), true) |> snd |> Array.head :?> Guid
 +
 +/// Wide text keeps its spaces. Other text is trimmed.
++let private textToCheck (field: Field) (raw: string) : string =
++    if isWide field.Kind then raw else raw.Trim()
++
 +let private textRules (field: Field) (maxLength: int) (raw: string) : string list =
-+    let text = if isWide field.Kind then raw else raw.Trim()
++    let text = textToCheck field raw
 +    if text = "" then [ required ]
 +    else
 +        [ if text.Length > maxLength then sprintf "must be %d characters or fewer" maxLength
@@ -731,19 +740,16 @@ index 0000000..9dc9642
 +    let invariant = CultureInfo.InvariantCulture
 +    match kind with
 +    | Text _ ->
-+        let text = if isWide field.Kind then raw else raw.Trim()
++        let text = textToCheck field raw
 +        if text = "" then Result.Error required
 +        elif field.Core = typeof<string> then Ok(box text)
 +        else Ok(FSharpValue.MakeUnion(FSharpType.GetUnionCases(field.Core, true)[0], [| box text |], true))
 +    | WholeNumber ->
-+        if field.Core = typeof<int64> then
-+            match Int64.TryParse(raw.Trim(), NumberStyles.Integer, invariant) with
-+            | true, n -> Ok(box n)
-+            | _ -> Result.Error "must be a whole number"
-+        else
-+            match Int32.TryParse(raw.Trim(), NumberStyles.Integer, invariant) with
-+            | true, n -> Ok(box n)
-+            | _ -> Result.Error "must be a whole number"
++        let isNarrow = field.Core <> typeof<int64>
++        match Int64.TryParse(raw.Trim(), NumberStyles.Integer, invariant) with
++        | true, n when not isNarrow -> Ok(box n)
++        | true, n when n >= int64 Int32.MinValue && n <= int64 Int32.MaxValue -> Ok(box (int n))
++        | _ -> Result.Error "must be a whole number"
 +    | Date ->
 +        match DateOnly.TryParseExact(raw.Trim(), "yyyy-MM-dd", invariant, DateTimeStyles.None) with
 +        | true, d -> Ok(box d)
@@ -764,9 +770,10 @@ index 0000000..9dc9642
 +    let fail message = Result.Error { Field = field.Name; Message = message }
 +    let kind = innerKind field.Kind
 +    let text = raw |> Option.defaultValue ""
++    let isEmptyInput = textToCheck field text = ""
 +    if kind = Boolean && raw.IsNone then
 +        Ok(box false)
-+    elif isOptional field.Kind && (not (isWide field.Kind) && text.Trim() = "" || text = "") then
++    elif isOptional field.Kind && isEmptyInput then
 +        Ok null
 +    else
 +        match parseCore field kind text with
@@ -826,8 +833,11 @@ let private idOf (value: obj) : Guid =
     FSharpValue.GetUnionFields(value, value.GetType(), true) |> snd |> Array.head :?> Guid
 
 /// Wide text keeps its spaces. Other text is trimmed.
+let private textToCheck (field: Field) (raw: string) : string =
+    if isWide field.Kind then raw else raw.Trim()
+
 let private textRules (field: Field) (maxLength: int) (raw: string) : string list =
-    let text = if isWide field.Kind then raw else raw.Trim()
+    let text = textToCheck field raw
     if text = "" then [ required ]
     else
         [ if text.Length > maxLength then sprintf "must be %d characters or fewer" maxLength
@@ -861,19 +871,16 @@ let private parseCore (field: Field) (kind: Kind) (raw: string) : Result<obj, st
     let invariant = CultureInfo.InvariantCulture
     match kind with
     | Text _ ->
-        let text = if isWide field.Kind then raw else raw.Trim()
+        let text = textToCheck field raw
         if text = "" then Result.Error required
         elif field.Core = typeof<string> then Ok(box text)
         else Ok(FSharpValue.MakeUnion(FSharpType.GetUnionCases(field.Core, true)[0], [| box text |], true))
     | WholeNumber ->
-        if field.Core = typeof<int64> then
-            match Int64.TryParse(raw.Trim(), NumberStyles.Integer, invariant) with
-            | true, n -> Ok(box n)
-            | _ -> Result.Error "must be a whole number"
-        else
-            match Int32.TryParse(raw.Trim(), NumberStyles.Integer, invariant) with
-            | true, n -> Ok(box n)
-            | _ -> Result.Error "must be a whole number"
+        let isNarrow = field.Core <> typeof<int64>
+        match Int64.TryParse(raw.Trim(), NumberStyles.Integer, invariant) with
+        | true, n when not isNarrow -> Ok(box n)
+        | true, n when n >= int64 Int32.MinValue && n <= int64 Int32.MaxValue -> Ok(box (int n))
+        | _ -> Result.Error "must be a whole number"
     | Date ->
         match DateOnly.TryParseExact(raw.Trim(), "yyyy-MM-dd", invariant, DateTimeStyles.None) with
         | true, d -> Ok(box d)
@@ -894,9 +901,10 @@ let parseField (field: Field) (raw: string option) : Result<obj, FieldError> =
     let fail message = Result.Error { Field = field.Name; Message = message }
     let kind = innerKind field.Kind
     let text = raw |> Option.defaultValue ""
+    let isEmptyInput = textToCheck field text = ""
     if kind = Boolean && raw.IsNone then
         Ok(box false)
-    elif isOptional field.Kind && (not (isWide field.Kind) && text.Trim() = "" || text = "") then
+    elif isOptional field.Kind && isEmptyInput then
         Ok null
     else
         match parseCore field kind text with
