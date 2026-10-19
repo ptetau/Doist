@@ -82,6 +82,8 @@ Each item was open in the design. This spec decides it. Review these first.
 - Errors cross component boundaries as `Result` values. Only the outer request handler turns an unexpected exception into `UNEXPECTED_ERROR`, and logs it with a reference id. *(assumed)* If wrong: unexpected exceptions reach the user as a 500 page.
 - `Scope` has a private constructor. Only `AuthorizingEngine` builds it. *(assumed how the seal works)* If wrong: any code can make a scope, and deny by default is lost.
 - Build-time `RecordsAccess` verbs (`planStorage` and `wire`) take the engine-only scope that `AuthorizingEngine` makes. *(assumed)* If wrong: the build cannot read records, which is intended.
+- Code folders use the spec's names: Generator, Access, Validate, Persist, Display, Api, Runtime. The design's component names stay inside those folders. *(assumed)* The map is in `pdlc/specs/design/DES-names.md`. If wrong: rename the folders. The walls do not move.
+- The checks use SQLite in memory as a test double. Checks that need SQL Server run only in CI, and carry a `RequiresSqlServer` marker. *(assumed)* The rule is in `pdlc/specs/design/DES-test-database.md`. If wrong: the paging checks would run only in CI.
 
 ### Words used here
 
@@ -261,20 +263,26 @@ Stored by `LeaseAccess`. `tryClaim` is the only verb that moves a job out of no 
 
 ### Module map
 
+Folders use the spec's names, as `pdlc/specs/design/DES-names.md` decides. Each folder holds the components that the table in that file maps to it. The components below keep the design's names, so that the design and this blueprint can be checked against each other.
+
 ```
 src/
-  Engine/
+  Typed.Engine/
     Contracts.fs              types from section 3
     Model.fs                  ModelCore: kinds, defaults, field plans (no dependencies)
-    Clients/                  PageClient, ApiClient, Scheduler, BuildTool
-    Managers/                 RecordsManager, SignInManager, JobsManager, BuildManager
-    Engines/                  AuthorizingEngine, ValidatingEngine, PresentingEngine, CheckingEngine
-    ResourceAccess/           RecordsAccess, SessionAccess, IdentityAccess, LeaseAccess, ModelsAccess
+    Generator/                BuildTool, BuildManager, CheckingEngine, ModelsAccess
+    Access/                   AuthorizingEngine
+    Validate/                 ValidatingEngine
+    Persist/                  RecordsAccess
+    Display/                  PresentingEngine, PageClient
+    Api/                      ApiClient
+    Runtime/                  RecordsManager, SignInManager, JobsManager, Scheduler,
+                              SessionAccess, IdentityAccess, LeaseAccess
     Utilities/                Logging, Alerting, Settings, WebGuard, Clock
-  App/
+  Todo.App/
     Models.fs                 the todo models, access rules, overrides, and hooks
 tests/
-  Features/                   the scenarios from section 6
+  Typed.Engine.Tests/         the scenarios from section 6, as xUnit checks
 ```
 
 `ModelCore` is not a component. It holds the stable parts that all components share: the kind list, the field plans, and the one-time lookup "override, then type default, then kind default." It depends on nothing.
