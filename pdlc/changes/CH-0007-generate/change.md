@@ -69,7 +69,7 @@ The library entry that the command calls, in `src/Typed.Engine.Generator/Generat
 - `run: Config -> TextWriter -> int`: runs the checks, writes the lines, writes the files, and gives the exit code. The checks call `run` with a changed `Config` to prove the lines about a removed rule or an added `unsafe` override. (assumed)
 - `todoConfig: outDir: string -> Config`: the config of the todo app, which `Program.main` uses.
 
-The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement, named with the requirement ID with a hyphen in place of the dot, in double backticks, such as ``module ``CAP-models-R1`` ``. F# does not allow a dot in a module name. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
+The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement. Name it with the requirement ID, with a hyphen in place of the dot, in double backticks: ``module ``CAP-models-R1`` ``. F# does not allow a dot in a module name. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
 
 ### Test seams
 
