@@ -223,7 +223,7 @@ none
   checks fail to compile, because `Typed.Engine.Validate` does not exist yet. Locked at
   7fab997.
 - 2026-10-19T06:15:23+00:00 · Build round 1: the builder found that `knownZone` in the Interface accepted
-  "pacific/auckland" on Linux, so one CAP-validate.R4 (time zone) check failed against correct code. The rule now
+  "pacific/auckland" on Linux. One CAP-validate.R4 (time zone) check failed against correct code. The rule now
   matches the zone id exactly. The test writer mirrored it. All 87 checks pass with the
   builder's code. Locked again at 6f34681.
 - 2026-10-19T06:16:19+00:00 · Build: the builder wrote `Validate.fs`. All 87 checks pass. The check files did
