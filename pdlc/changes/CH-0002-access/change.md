@@ -1,6 +1,6 @@
 # CH-0002 · Access
 
-Intent: IN-0001 · Scope: CAP-access · Status: planned · Ticket: none · Branch: none · Base: main
+Intent: IN-0001 · Scope: CAP-access · Status: testing · Ticket: none · Branch: pdlc/CH-0002-access · Base: pdlc/CH-0001-models
 Tests-Locked: none
 
 ## Delivers
