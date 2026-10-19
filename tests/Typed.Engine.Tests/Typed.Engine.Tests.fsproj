@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="CAP-models.Tests.fs" />
     <Compile Include="CAP-access.Tests.fs" />
+    <Compile Include="CAP-validate.Tests.fs" />
   </ItemGroup>
 
   <ItemGroup>

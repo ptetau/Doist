@@ -16,7 +16,7 @@ type, and from `rule` overrides.
 
 ### CAP-validate.R1 · Validation returns one error list for each field
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 The result of a check is a list of field errors. Each field error holds the field name
 and one message. An empty list means that the record passes.
@@ -28,7 +28,7 @@ and one message. An empty list means that the record passes.
 
 ### CAP-validate.R2 · A `Title` is 1 to 200 characters on one line, trimmed
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a `TodoList` with the name "  Groceries  ", when validation runs, then the
   result is an empty list.
@@ -49,7 +49,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-validate.R3 · `Notes` is up to 5,000 characters and can be empty
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a `Todo` with `Notes = None`, when validation runs, then there is no error on
   `Notes`.
@@ -63,7 +63,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-validate.R4 · A `TimeZoneId` is a known IANA zone
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a `User` with the time zone "Pacific/Auckland", when validation runs, then there
   is no error on `TimeZone`.
@@ -75,7 +75,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-validate.R5 · A reference must point at a record
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a `Todo` with `List = Ref Guid.Empty`, when validation runs, then the result is one
   error on `List` with the message "is required".
@@ -84,7 +84,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-validate.R6 · A `rule` override adds its message when its predicate fails
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the override `rule <@ fun t -> t.Title @> (fun (Title s) -> s <> "forbidden")
   "Title is reserved"`, and a `Todo` with the title "forbidden". When validation runs,
@@ -94,7 +94,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-validate.R7 · An enum value must be a known case
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 The F# type makes an unknown case impossible in code. This rule applies to raw input, such
 as a form value or a JSON string.
@@ -107,7 +107,7 @@ as a form value or a JSON string.
 
 ### CAP-validate.R8 · Raw input parses by kind, or gives a field error
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 A form or the API gives each field as text. The engine parses the text by the kind of the
 field. A value that does not parse gives one error on that field.

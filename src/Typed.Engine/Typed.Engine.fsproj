@@ -8,6 +8,7 @@
     <Compile Include="Model.fs" />
     <Compile Include="Overrides.fs" />
     <Compile Include="Access.fs" />
+    <Compile Include="Validate.fs" />
   </ItemGroup>
 
 </Project>

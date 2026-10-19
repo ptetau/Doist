@@ -1,0 +1,134 @@
+{
+  "kind": "terminal",
+  "title": "CH-0003 \u00b7 Validate",
+  "steps": [
+    {
+      "caption": "CH-0003 \u00b7 Build the engine library",
+      "run": "dotnet build src/Typed.Engine/Typed.Engine.fsproj --nologo -v q"
+    },
+    {
+      "caption": "CAP-validate.R1 \u00b7 A valid list gives an empty error list",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R1.1"
+    },
+    {
+      "caption": "CAP-validate.R1 \u00b7 Two broken fields give one error for each field",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R1.2"
+    },
+    {
+      "caption": "CAP-validate.R2 \u00b7 \"  Groceries  \" passes, trimmed",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R2.1"
+    },
+    {
+      "caption": "CAP-validate.R2 \u00b7 \"   \" is required",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R2.2"
+    },
+    {
+      "caption": "CAP-validate.R2 \u00b7 200 characters pass",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R2.3"
+    },
+    {
+      "caption": "CAP-validate.R2 \u00b7 201 characters: must be 200 characters or fewer",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R2.4"
+    },
+    {
+      "caption": "CAP-validate.R2 \u00b7 \"Shop\\nlater\": must be on one line",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R2.5"
+    },
+    {
+      "caption": "CAP-validate.R2 \u00b7 \"Shop\\tlater\" passes, a tab is not a line break",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R2.6"
+    },
+    {
+      "caption": "CAP-validate.R2 \u00b7 200 characters with 3 spaces at each end pass",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R2.7"
+    },
+    {
+      "caption": "CAP-validate.R2 \u00b7 \"<script>alert(1)</script>\" passes validation",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R2.8"
+    },
+    {
+      "caption": "CAP-validate.R3 \u00b7 Notes = None has no error",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R3.1"
+    },
+    {
+      "caption": "CAP-validate.R3 \u00b7 Notes of 5000 characters has no error",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R3.2"
+    },
+    {
+      "caption": "CAP-validate.R3 \u00b7 Notes of 5001 characters: must be 5000 characters or fewer",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R3.3"
+    },
+    {
+      "caption": "CAP-validate.R3 \u00b7 Notes of 5000 characters plus one space: error, no trim",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R3.4"
+    },
+    {
+      "caption": "CAP-validate.R4 \u00b7 \"Pacific/Auckland\" has no error",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R4.1"
+    },
+    {
+      "caption": "CAP-validate.R4 \u00b7 \"Mars/Base\": must be a known time zone",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R4.2"
+    },
+    {
+      "caption": "CAP-validate.R4 \u00b7 \"pacific/auckland\": error, the name is case-sensitive",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R4.3"
+    },
+    {
+      "caption": "CAP-validate.R5 \u00b7 List = Ref Guid.Empty is required",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R5.1"
+    },
+    {
+      "caption": "CAP-validate.R5 \u00b7 List = Ref of an id has no error",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R5.2"
+    },
+    {
+      "caption": "CAP-validate.R6 \u00b7 rule on Title: \"forbidden\" gives \"Title is reserved\"",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R6.1"
+    },
+    {
+      "caption": "CAP-validate.R6 \u00b7 rule on Title: \"Pay rent\" has no error",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R6.2"
+    },
+    {
+      "caption": "CAP-validate.R7 \u00b7 \"Urgent\": must be one of Low, Normal, High",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R7.1"
+    },
+    {
+      "caption": "CAP-validate.R7 \u00b7 \"High\" parses to the case High",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R7.2"
+    },
+    {
+      "caption": "CAP-validate.R8 \u00b7 \"abc\" for a whole number: must be a whole number",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R8.1"
+    },
+    {
+      "caption": "CAP-validate.R8 \u00b7 \"2026-02-30\": must be a date in the form YYYY-MM-DD",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R8.2"
+    },
+    {
+      "caption": "CAP-validate.R8 \u00b7 \"2026-10-18\" parses to Some 2026-10-18",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R8.3"
+    },
+    {
+      "caption": "CAP-validate.R8 \u00b7 \"\" for the optional Due is None",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R8.4"
+    },
+    {
+      "caption": "CAP-validate.R8 \u00b7 \"\" for the required Title is required",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R8.5"
+    },
+    {
+      "caption": "CAP-validate.R8 \u00b7 \"on\", \"true\", \"false\", and missing for Done",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R8.6"
+    },
+    {
+      "caption": "CAP-validate.R8 \u00b7 \"yes\" for Done: must be true or false",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0003-validate/show.fsx R8.7"
+    },
+    {
+      "caption": "CH-0003 \u00b7 All 32 checks of CAP-validate pass",
+      "run": "dotnet test tests/Typed.Engine.Tests --filter DisplayName~CAP-validate --nologo -v q"
+    }
+  ]
+}
