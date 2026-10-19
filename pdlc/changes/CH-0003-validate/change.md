@@ -1,6 +1,6 @@
 # CH-0003 · Validate
 
-Intent: IN-0001 · Scope: CAP-validate · Status: planned · Ticket: none · Branch: none · Base: main
+Intent: IN-0001 · Scope: CAP-validate · Status: testing · Ticket: none · Branch: pdlc/CH-0003-validate · Base: pdlc/CH-0002-access
 Tests-Locked: none
 
 ## Delivers
