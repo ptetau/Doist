@@ -82,7 +82,7 @@ Project `src/Todo.App/Todo.App.fsproj` (references `Typed.Engine`):
   - `isOverdue: HookContext -> Todo -> bool` (computed value)
 - The check for CAP-todo-app.R6 (no other code) lists the `.fs` files in `src/Todo.App/` on disk, and runs `Checks.run` over `Defaults.typeDefaults`, `Defaults.models`, `Schema.access`, and `Schema.overrideSets`.
 
-The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement, named with the requirement ID in double backticks, such as ``module ``CAP-models.R1`` ``. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
+The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement, named with the requirement ID with a hyphen in place of the dot, in double backticks, such as ``module ``CAP-models-R1`` ``. F# does not allow a dot in a module name. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
 
 ### Test seams
 

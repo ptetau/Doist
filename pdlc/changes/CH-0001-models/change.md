@@ -1,7 +1,7 @@
 # CH-0001 · Models
 
 Intent: IN-0001 · Scope: CAP-models · Status: building · Ticket: none · Branch: pdlc/CH-0001-models · Base: ccr-1ef8bdfa-1cxxi7
-Tests-Locked: 5dba628
+Tests-Locked: c61b18d
 
 ## Delivers
 
@@ -157,7 +157,7 @@ The type defaults of the todo app are these four entries, and no others. `Priori
 | `TimeZoneId` | `Text 64` | known IANA zone | false | false |
 | `ExternalId` | `Text 255` | none | true | true |
 
-The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement, named with the requirement ID in double backticks, such as ``module ``CAP-models.R1`` ``. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
+The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement, named with the requirement ID with a hyphen in place of the dot, in double backticks, such as ``module ``CAP-models-R1`` ``. F# does not allow a dot in a module name. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
 
 ### Test seams
 
@@ -230,3 +230,7 @@ none
   project. Red: `dotnet test` fails to compile, because `Typed.Engine` does not exist yet.
   Every error names a missing symbol of the Interface. No error is a fault in a check.
   Locked at 5dba628.
+- 2026-10-19T05:47:07+00:00 · Build round 1: the builder found that F# rejects a dot in a module name. The
+  test writer renamed the seven modules with a hyphen. The check names did not change.
+  The builder's engine code is in the working tree, so the checks now run. Locked again
+  at c61b18d.
