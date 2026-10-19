@@ -254,6 +254,7 @@ Notes on the verbs:
 - `RecordsAccess` verbs are record verbs because records are this system's business. `Revise` checks `Version`. `Add`, `Revise`, and `Remove` also write the audit entry in the same transaction. That is why there is no separate audit component.
 - Every `RecordsAccess` verb takes a `Scope`. Only `AuthorizingEngine` can make a `Scope`. A call with no scope does not compile. This is the "deny by default" rule, enforced by types.
 - A record outside the scope is "not found". The Manager returns 404.
+- Build-time verbs (`RecordsAccess.PlanStorage` and `Wire`) take the engine-only scope that `AuthorizingEngine` makes.
 
 ### Cross-cutting concerns
 
@@ -299,7 +300,7 @@ Each brick traces to a feature, or to a named volatility. Inputs and Transports 
 
 | Brick | Kind | Does | Traces to |
 | --- | --- | --- | --- |
-| `TakeWritable` | Transform | Drops system, read-only, and route-set fields | F4, F6 |
+| `TakeWritable` | Transform | Drops read-only and route-set fields, and every system field except `Version`. `Version` passes on to `Revise`, so stale saves are caught. | F4, F6 |
 | `ParseField` | Transform | Raw text to a typed value, through the semantic type | F4, V1 |
 | `CheckKind` | Transform | Kind rules (range, decimal places, known case, valid date) | F4, V1 |
 | `CheckOverrideRule` | Transform | Runs `rule field predicate message` | V3 |
@@ -418,7 +419,8 @@ The API chain is the same from step 2, with `ApiClient` in place of `PageClient`
 
 **UC3, Sign in.** The caller is a browser. The provider says who the user is.
 
-1. `PageClient → SignInManager.BeginSignIn`, then `IdentityAccess.BeginSignIn`
+1. `PageClient → SignInManager.BeginSignIn`
+   `SignInManager → IdentityAccess.BeginSignIn`
 2. Provider returns; `PageClient → SignInManager.CompleteSignIn`
 3. `SignInManager → IdentityAccess.CompleteSignIn` (identity)
 4. `SignInManager → RecordsAccess.FindBy` (the `Subject`, with the engine scope from `AuthorizingEngine.ScopeFor`)
@@ -457,7 +459,9 @@ Result: **4 of 4** walk through with no new component and no broken call rule.
 | V15 Models come from a different source | `ModelsAccess` | Pass |
 | V16 New header or limit | `WebGuard` and `Settings` | Pass |
 
-Result: **14 of 16** touch one component, or only an allowed exception. Two are accepted leaks.
+An **allowed exception** is a change that adds a new caller (one new Client) or a new access fact (one rule brick and one new verb). The table marks these as passes.
+
+Result: **15 of 17** rows pass. Two rows are accepted leaks. Each volatility has one main wall, and the two leaks also touch other components.
 
 ### 6.3 Feature assembly
 
@@ -523,7 +527,7 @@ For each brick, the question is: if its requirement changed a lot, what else wou
 
 - Each component traces to a volatility: see the table in section 4.
 - Each brick traces to a feature or a volatility: see section 5.
-- **Cut list:** none. Two things were cut during design. A shared `SqlRunner` Utility, because only the second port needs it. A stored-workflow tool, because no flow differs by customer.
+- **Cut list:** two items were cut during design. A shared `SqlRunner` Utility, because only the second port needs it. A stored-workflow tool, because no flow differs by customer.
 
 ### 6.7 Measured coupling
 
