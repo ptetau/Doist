@@ -1,6 +1,6 @@
 # IN-0001 · Engine core: generator, checks, validate, persist
 
-Status: specifying · Ticket: none · Branch: none · Added: 2026-10-19
+Status: ready · Ticket: none · Branch: none · Added: 2026-10-19
 
 ## What and why
 
@@ -42,6 +42,9 @@ the walls and the Gherkin scenarios. Use the scenarios as the start of the check
 - CAP-checks.R8 (unsafe warning): added
 - CAP-checks.R9 (redundant override warning): added
 - CAP-checks.R10 (todo app passes): added
+- CAP-checks.R11 (duplicate override): added at ready
+- CAP-checks.R12 (finding order): added at ready
+- CAP-checks.R13 (sort or view that cannot be served): added at ready
 - CAP-validate.R1 (errors for each field): added
 - CAP-validate.R2 (Title rules): added
 - CAP-validate.R3 (Notes length): added
@@ -49,16 +52,17 @@ the walls and the Gherkin scenarios. Use the scenarios as the start of the check
 - CAP-validate.R5 (reference required): added
 - CAP-validate.R6 (rule override): added
 - CAP-validate.R7 (enum case): added
+- CAP-validate.R8 (raw input by kind): added at ready
 - CAP-access.R1 (four rules): added
 - CAP-access.R2 (read-only condition): added
-- CAP-access.R3 (sealed scope): added
+- CAP-access.R3 (sealed scope): added, changed at ready
 - CAP-access.R4 (read-only refusal): added
 - CAP-access.R5 (owner from parent): added
 - CAP-persist.R1 (tables): added
 - CAP-persist.R2 (foreign keys): added
 - CAP-persist.R3 (indexes): added
 - CAP-persist.R4 (list query): added
-- CAP-persist.R5 (keyset paging): added
+- CAP-persist.R5 (keyset paging): added, changed at ready
 - CAP-persist.R6 (child deletes): added
 - CAP-persist.R7 (stale save): added
 - CAP-persist.R8 (migration drop): added
@@ -71,7 +75,7 @@ the walls and the Gherkin scenarios. Use the scenarios as the start of the check
 - JOB-generate.R1 (findings and exit code): added
 - JOB-generate.R2 (schema file): added
 - JOB-generate.R3 (README): added
-- DES-errors: 14 rows added
+- DES-errors: 16 rows added
 
 ## Changes
 
@@ -92,75 +96,98 @@ intent, in order.
 - Stage 3 here covers the schema, indexes, owner filter, paging, child deletes, stale
   saves, and migrations. The audit log, sessions, and the daily jobs wait for a later
   intent (assumed), because they need SQL Server to prove.
-- CAP-checks.R9: the message of the redundant override warning → "Override Todo.Due label
+- CAP-checks.R9 (redundant override warning): the message of the redundant override warning → "Override Todo.Due label
   matches the default." (assumed)
-- CAP-validate.R7: the message for an unknown enum case → "must be one of Low, Normal,
+- CAP-validate.R7 (enum case): the message for an unknown enum case → "must be one of Low, Normal,
   High" (assumed)
-- CAP-access.R3: the scope for a `self` model → the owner filter, where the record id is
-  the user id (assumed)
-- CAP-persist.R5: the page size limits → default 50, maximum 200, from the spec. A size
-  over 200 is cut to 200 (assumed)
-- CAP-todo-app.R6: how to prove "no other code" → the app project has only the four
+- CAP-access.R3 (sealed scope): was "the owner filter for `u1`, and `u1` is the record id".
+  Now "the self scope for `u1`, which matches only the record whose `Id` is `u1`". The `User` table has
+  no `Owner` column (CAP-persist.R1 (tables)), so the guess gave way.
+- CAP-persist.R5 (keyset paging): was "a page size of 300 → the engine uses the size 200".
+  Now "a page size outside 1 to 200 → `VALIDATION_FAILED` on `limit`". One rule for both edges.
+- CAP-persist.R5 (keyset paging): no page size → 50 (assumed). A bad cursor → `VALIDATION_FAILED` on
+  `cursor` (assumed)
+- CAP-persist.R3 (indexes) and R4 (list query): the wide-text sort and the unsupported view moved to
+  CAP-checks.R13 (sort or view that cannot be served). The checks produce those findings.
+- CAP-persist.R7 (stale save): a new record is at version 1. A save with no version →
+  `VALIDATION_FAILED` on `Version` (assumed)
+- CAP-persist.R8 (migration drop): the shape lives in `build/shape.json`. No file → the full schema. A file
+  that is not JSON → `SHAPE_UNREADABLE`. A new required column → `UNSAFE_MIGRATION`
+  (assumed)
+- CAP-models.R1 (kinds from types): an empty record → a plan with no fields. A union as a model →
+  `WRONG_CONFIG_TYPE` (assumed)
+- CAP-checks.R11 (duplicate override): two overrides of one kind on one field → `WRONG_CONFIG_TYPE` (assumed)
+- CAP-checks.R12 (finding order): findings in model order, then field order (assumed)
+- CAP-validate.R2 (Title rules): a tab is not a line break. `<script>` passes validation, because
+  encoding is the job of the display (assumed)
+- CAP-validate.R3 (Notes length): the length of notes counts as given, with no trim (assumed)
+- CAP-validate.R4 (time zone): the time zone name is case-sensitive (assumed)
+- CAP-validate.R8 (raw input by kind): the parse messages for a whole number, a date, and a boolean.
+  The values "on", "true", "false" for a checkbox (assumed)
+- CAP-access.R4 (read-only refusal): creating a todo in an archived list → `READ_ONLY_RECORD` (assumed)
+- CAP-todo-app.R6 (no other code): how to prove "no other code" → the app project has only the four
   files (assumed)
-- JOB-generate.R1: the command → `dotnet run --project src/Typed.Engine.Generator --
-  generate`, output lines `<severity> <code> <message>` (assumed)
-- JOB-generate.R2: where the schema goes → `build/schema.sql` (assumed)
+- JOB-generate.R1 (findings and exit code): the command → `dotnet run --project src/Typed.Engine.Generator --
+  generate`, output lines `<severity> <code> <message>` to standard output. An unknown
+  command → usage and exit 2 (assumed)
+- JOB-generate.R2 (schema file): where the schema goes → `build/schema.sql`. The command creates
+  `build/` (assumed)
 - CAP-todo-app is a capability, not a job, because the models and hooks are shared logic
   for the later page and API jobs (assumed)
 
 ## Handoff
 
-### Handoff · IN-0001 · intake → ready
+### Handoff · IN-0001 · ready → change
 
-Time: 2026-10-19T05:25:41+00:00
+Time: 2026-10-19T05:32:48+00:00
 
 ### Done
 
-Wrote six capability specs and one job spec, with 46 requirements. Added 14 rows to
-`DES-errors`. The specs follow the spec's names (`DES-names`): CAP-models (the model
-plan), CAP-checks (build checks), CAP-validate, CAP-access, CAP-persist, CAP-todo-app
-(the first app), and JOB-generate (the command).
+Settled the implied behaviour of all 49 requirements: bad and empty input, limits, order,
+stored data, unsafe input, and open rules. Added CAP-checks.R11 (duplicate override), R12 (finding order)
+(finding order), R13 (sort or view that cannot be served), and CAP-validate.R8 (raw input
+by kind). Found one contradiction between CAP-access.R3 (self scope) and CAP-persist.R1 (tables)
+(no `Owner` column on `User`). The guessed side gave way. Set every requirement to `ready`
+and the intent to `ready`.
 
 ### Decided on defaults
 
-- CAP-checks.R9: the message of the redundant override warning → "Override Todo.Due label
-  matches the default." (assumed)
-- CAP-validate.R7: the message for an unknown enum case → "must be one of Low, Normal,
-  High" (assumed)
-- CAP-access.R3: the scope for a `self` model → the owner filter with the user id as the
-  record id (assumed)
-- CAP-persist.R5: page size over 200 → cut to 200, no size → 50 (assumed)
-- CAP-todo-app.R6: proof of "no other code" → only four files in the app project
-  (assumed)
-- JOB-generate.R1: command and output line form (assumed)
-- JOB-generate.R2: schema path `build/schema.sql` (assumed)
-- Stage 3 scope: audit, sessions, and jobs wait for a later intent (assumed)
-- CAP-todo-app is a capability (assumed)
+See the "Notes" of this intent. Each line that ends in (assumed) is a default from this
+stage or from intake.
 
 ### Open
 
 - The branch question: pdlc expects `main` and one `pdlc/CH-*` branch for each change.
   This session is pinned to one branch. The user decides before the tests stage.
-- CAP-persist.R6 (child deletes) needs a way to inject a failure mid-transaction. The
-  change stage must give a seam.
-- CAP-persist.R8 (migrations) needs a stored shape. The change stage decides where the
-  shape lives.
+- The change stage must give three test seams. The clock, for CAP-todo-app.R4
+  (completion hook) and R5 (overdue hook). A failure point inside the delete transaction,
+  for CAP-persist.R6 (child deletes). The paths of `build/shape.json` and
+  `build/schema.sql`, for CAP-persist.R8 (migration drop) and JOB-generate (the command).
 
 ### Look here
 
 - pdlc/specs/capabilities/CAP-*.md
 - pdlc/specs/jobs/JOB-generate.md
-- pdlc/specs/design/DES-errors.md
-- docs/spec/typed-layers-engine.md (the source)
-- docs/design/typed-layers-engine.blueprint.md (section 6 scenarios)
+- pdlc/specs/design/DES-errors.md, pdlc/specs/design/DES-names.md, and
+  pdlc/specs/design/DES-test-database.md
+- docs/design/typed-layers-engine.blueprint.md (section 5 for the module map)
 
 ### Don't redo
 
-- The spec names and the mapping in `DES-names`.
-- The SQLite test double rule in `DES-test-database`.
+- The requirement text. Each line is clear and has concrete values.
+- The error codes. Each failure line names a code that `DES-errors` holds.
 
 ### Next: do this first
 
-Run the ready checklist over each requirement. Look hardest at CAP-persist.R5 (paging),
-R6 (child deletes), R7 (stale save), and R8 (migration), which have the most implied
-behaviour.
+Plan one change for each spec, in this order:
+
+1. CAP-models (model plan)
+2. CAP-access (access rules)
+3. CAP-validate (validation)
+4. CAP-persist (storage)
+5. CAP-checks (build checks)
+6. CAP-todo-app (the first app)
+7. JOB-generate (the command)
+
+CAP-checks (build checks) comes after CAP-persist (storage). CAP-checks.R13 (sort or view
+that cannot be served) needs the view translator and the wide-text rule.

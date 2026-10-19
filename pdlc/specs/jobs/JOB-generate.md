@@ -22,7 +22,7 @@ prints each finding, and writes the schema. The build fails when any finding is 
 
 ### JOB-generate.R1 · The command prints each finding and sets the exit code
 
-Status: proposed · Intents: IN-0001
+Status: ready · Intents: IN-0001
 
 The command is `dotnet run --project src/Typed.Engine.Generator -- generate` (assumed).
 It prints one line for each finding, in the form `<severity> <code> <message>`
@@ -37,19 +37,25 @@ It prints one line for each finding, in the form `<severity> <code> <message>`
   When the builder runs `generate`, then the output holds the line "warning
   UNSAFE_ESCAPE_HATCH Unsafe escape hatch TodoList.rawName: uses raw SQL". The exit
   code is 0.
+- Given the command `frobnicate`. When the builder runs it, then the output holds "usage:
+  generate" and the exit code is 2. (assumed)
+- Given the todo app, when the builder runs `generate`, then each finding line goes to
+  standard output. (assumed)
 
 ### JOB-generate.R2 · The command writes the schema when there is no error
 
-Status: proposed · Intents: IN-0001
+Status: ready · Intents: IN-0001
 
 - Given the todo app. When the builder runs `generate`, then the file `build/schema.sql`
   holds the tables, the foreign keys, and the indexes of the three models. (assumed)
 - Given the todo app with the access rule of `Todo` removed, when the builder runs
   `generate`, then `build/schema.sql` is not written.
+- Given no `build/` folder, when the builder runs `generate`, then the command creates the
+  folder. (assumed)
 
 ### JOB-generate.R3 · The README tells how to run the generator and the checks
 
-Status: proposed · Intents: IN-0001
+Status: ready · Intents: IN-0001
 
 - Given the README, when a reader looks for the generator, then the README gives the
   `generate` command and the meaning of its exit codes.

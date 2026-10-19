@@ -24,6 +24,8 @@ exact error.
 | `UNPLANNED_DROP` | A migration would drop a column with no `renamedFrom` | caller | no |
 | `UNSAFE_ESCAPE_HATCH` | Warning: an `unsafe` override, listed with its reason | caller | no |
 | `REDUNDANT_OVERRIDE` | Warning: an override that equals the default | caller | no |
+| `UNSAFE_MIGRATION` | A new required column has no default, so existing rows would fail | caller | no |
+| `SHAPE_UNREADABLE` | The stored shape file cannot be read | caller | no |
 
 When a requirement needs a new error, add a row. When the meaning is the same, use the
 existing code again.

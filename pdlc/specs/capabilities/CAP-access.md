@@ -17,7 +17,7 @@ scope of a caller is not found.
 
 ### CAP-access.R1 · Each model declares one of four rules
 
-Status: proposed · Intents: IN-0001
+Status: ready · Intents: IN-0001
 
 - Given `rule<TodoList> owned`, when a caller reads the rule, then the model name is
   "TodoList" and the access is `Owned`.
@@ -29,7 +29,7 @@ Status: proposed · Intents: IN-0001
 
 ### CAP-access.R2 · A read-only condition names a bool field of the parent
 
-Status: proposed · Intents: IN-0001
+Status: ready · Intents: IN-0001
 
 - Given `ownedVia <@ fun t -> t.List @> |> readOnlyWhenParent <@ fun l -> l.Archived @>`,
   when a caller reads the rule, then the read-only condition names the model "TodoList"
@@ -40,15 +40,18 @@ Status: proposed · Intents: IN-0001
 
 ### CAP-access.R3 · Only this capability can make a scope
 
-Status: proposed · Intents: IN-0001
+Status: ready · Intents: IN-0001
 
-A scope is an owner filter, or the engine-only scope. The scope type has a private
+A scope is an owner filter, a self scope, or the engine-only scope. The scope type has a private
 constructor. Other code cannot make one.
 
 - Given a user with the id `u1`, when the engine makes the scope for `TodoList`, then the
   scope is the owner filter for `u1`.
 - Given the model `User` with the rule `self`. When the engine makes the scope for a user
-  `u1`, then the scope is the owner filter for `u1`, and `u1` is the record id. (assumed)
+  `u1`, then the scope is the self scope for `u1`. It matches only the record whose `Id` is
+  `u1`. (assumed)
+- Given the model `Todo` with its `ownedVia` rule. When the engine makes the scope for `u1`,
+  then the scope is the owner filter for `u1`, because the owner is copied to each todo.
 - Given the model `Audit` with the rule `system`, when the engine makes a user scope, then
   the result is the error `NOT_FOUND`.
 - Given the engine itself, when the engine makes the build scope, then the scope is the
@@ -56,7 +59,7 @@ constructor. Other code cannot make one.
 
 ### CAP-access.R4 · A change to a read-only record is refused with its reason
 
-Status: proposed · Intents: IN-0001
+Status: ready · Intents: IN-0001
 
 - Given the list "Old" with `Archived = true`. When the engine checks a change to a todo of
   that list, then the result is the error `READ_ONLY_RECORD`. The reason is "This list is
@@ -65,10 +68,15 @@ Status: proposed · Intents: IN-0001
   todo of that list, then the check passes.
 - Given the list "Old" with `Archived = true`, when the engine checks a delete of the list
   itself, then the check passes.
+- Given a todo whose list does not exist. When the engine checks a change to the todo,
+  then the result is the error `NOT_FOUND`.
+- Given the list "Old" with `Archived = true`. When the engine checks the creation of a
+  todo in that list, then the result is the error `READ_ONLY_RECORD`. The reason is "This
+  list is archived". (assumed)
 
 ### CAP-access.R5 · The owner of a child is copied from its parent
 
-Status: proposed · Intents: IN-0001
+Status: ready · Intents: IN-0001
 
 - Given a user `u1` and a list owned by `u1`. When the engine decides the owner of a new
   todo in that list, then the owner is `u1`.
