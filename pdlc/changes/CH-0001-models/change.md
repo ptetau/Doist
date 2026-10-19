@@ -1,6 +1,6 @@
 # CH-0001 · Models
 
-Intent: IN-0001 · Scope: CAP-models · Status: testing · Ticket: none · Branch: pdlc/CH-0001-models · Base: ccr-1ef8bdfa-1cxxi7
+Intent: IN-0001 · Scope: CAP-models · Status: building · Ticket: none · Branch: pdlc/CH-0001-models · Base: ccr-1ef8bdfa-1cxxi7
 Tests-Locked: 5dba628
 
 ## Delivers
