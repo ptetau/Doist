@@ -4,7 +4,7 @@ Time: 2026-10-19T10:14:32+00:00
 
 ## Done
 
-Recorded `pdlc/changes/CH-0005-checks/review.gif` with 26 frames. The GIF shows 24 of 24 acceptance lines of CAP-checks (R1 to R13). Each frame shows the call to `Checks.run` and its findings.
+Recorded `pdlc/changes/CH-0005-checks/review.gif` with 26 frames. The GIF shows 24 of 24 acceptance lines of CAP-checks (R1 (no access rule) to R13 (unsupported view)). Each frame shows the call to `Checks.run` and its findings.
 
 - Frame 1: the build of `Typed.Engine` succeeds.
 - Frames 2 to 4 (R1): no rule gives MISSING_ACCESS_RULE. Two rules give "more than one access rule". The todo app gives none.
@@ -25,7 +25,7 @@ Recorded `pdlc/changes/CH-0005-checks/review.gif` with 26 frames. The GIF shows 
 ## Decided on defaults
 
 - Frame 10 (R5) shows the rule `readOnlyTodoOwnedVia`, as the check does. Thus a second finding appears.
-- The R13 view message shows the quotation tree. The spec only fixes its start.
+- The R13 (unsupported view) message shows the quotation tree. The spec only fixes its start.
 - I looked at 10 frames in full: 2, 3, 4, 6, 7, 10, 14, 22, 25, and 26. I read the text output of all 24 lines.
 
 ## Open
@@ -42,4 +42,4 @@ Recorded `pdlc/changes/CH-0005-checks/review.gif` with 26 frames. The GIF shows 
 
 ## Next: do this first
 
-Run `/pdlc:verify` for CH-0005.
+Run `/pdlc:verify` for CH-0005 (checks).
