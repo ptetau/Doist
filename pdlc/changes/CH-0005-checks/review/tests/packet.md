@@ -61,8 +61,8 @@ Look for these traps:
 ````
 # CH-0005 · Checks
 
-Intent: IN-0001 · Scope: CAP-checks · Status: testing · Ticket: none · Branch: pdlc/CH-0005-checks · Base: pdlc/CH-0004-persist
-Tests-Locked: 09ce3bfba7806424b1e5c4c262c49dde5bc47552
+Intent: IN-0001 · Scope: CAP-checks · Status: building · Ticket: none · Branch: pdlc/CH-0005-checks · Base: pdlc/CH-0004-persist
+Tests-Locked: 64c6b57ba2882b1c4f19e43f3e7f9a2fcb199913
 
 ## Delivers
 
@@ -294,6 +294,9 @@ none
 ## Progress log
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-checks` as the ready stage left them.
+- Built: 176 checks pass (36 new). The builder added Checks.fs and its Compile entry.
+- Verified: all remits pass. Filed IN-0015 (stray access rule) as a follow-up.
+- Sent back to tests: the gate found two weak checks (R3 type order, R9 near-case label).
 ````
 
 ## The spec it covers: title and summary
@@ -318,7 +321,7 @@ finding does not. The generator job prints the findings.
 
 ### CAP-checks.R1 · A model with no access rule fails the build
 
-Status: ready · Intents: IN-0001
+Status: built · Intents: IN-0001
 
 - Given the model `TodoList` and no access rules. When the checks run, then the findings
   hold the error `MISSING_ACCESS_RULE` with the message "Model TodoList has no access
@@ -331,7 +334,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-checks.R2 · An override that names a missing field fails the build
 
-Status: ready · Intents: IN-0001
+Status: built · Intents: IN-0001
 
 The F# compiler refuses a selector of a field that does not exist. This check covers an
 override set that names a model with no description. It also covers an override item that names a
@@ -346,7 +349,7 @@ field that the plan does not hold.
 
 ### CAP-checks.R3 · An override with config for the wrong type fails the build
 
-Status: ready · Intents: IN-0001
+Status: built · Intents: IN-0001
 
 - Given the override `rule <@ fun t -> t.Due @>` whose predicate takes a `string`, when
   the checks run, then the findings hold the error `WRONG_CONFIG_TYPE`. The message
@@ -356,7 +359,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-checks.R4 · An override that targets a system field fails the build
 
-Status: ready · Intents: IN-0001
+Status: built · Intents: IN-0001
 
 - Given a `Column` item for the field "Version" of `Todo`. When the checks run, then the
   findings hold the error `SYSTEM_FIELD_TARGET` with the message "Override targets system
@@ -364,7 +367,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-checks.R5 · A reference to a model that does not exist fails the build
 
-Status: ready · Intents: IN-0001
+Status: built · Intents: IN-0001
 
 - Given the model `Todo` alone, with its field `List: Ref<TodoList>`. When the checks run,
   then the findings hold the error `DANGLING_REFERENCE` with the message "Field Todo.List
@@ -372,7 +375,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-checks.R6 · A referenced model with no title field fails the build
 
-Status: ready · Intents: IN-0001
+Status: built · Intents: IN-0001
 
 - Given a model `NoTitle` with one field `Count: int`, and a model `Child` with the field
   `Parent: Ref<NoTitle>`, and no `titleField` override. When the checks run, then the
@@ -383,7 +386,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-checks.R7 · An `ownedVia` rule must name a reference to its parent
 
-Status: ready · Intents: IN-0001
+Status: built · Intents: IN-0001
 
 - Given the access rule `ownedVia <@ fun t -> t.Title @>` for `Todo`. When the checks
   run, then the findings hold the error `WRONG_CONFIG_TYPE` with the message "ownedVia
@@ -394,7 +397,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-checks.R8 · Each `unsafe` escape hatch is a warning that gives its reason
 
-Status: ready · Intents: IN-0001
+Status: built · Intents: IN-0001
 
 - Given the override `unsafe "rawName" "uses raw SQL"` for `TodoList`. When the checks
   run, then the findings hold no error, and one warning `UNSAFE_ESCAPE_HATCH` with the message
@@ -402,7 +405,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-checks.R9 · An override that matches the default is a warning
 
-Status: ready · Intents: IN-0001
+Status: built · Intents: IN-0001
 
 - Given the override `label <@ fun t -> t.Due @> "Due"` for `Todo`. When the checks run,
   then the findings hold one warning `REDUNDANT_OVERRIDE` with the message "Override
@@ -412,14 +415,14 @@ Status: ready · Intents: IN-0001
 
 ### CAP-checks.R10 · The todo app passes every check
 
-Status: ready · Intents: IN-0001
+Status: built · Intents: IN-0001
 
 - Given the three models, the three access rules, and the two override sets of the todo
   app. When the checks run, then there are no error findings.
 
 ### CAP-checks.R11 · Two overrides of one kind on one field fail the build
 
-Status: ready · Intents: IN-0001
+Status: built · Intents: IN-0001
 
 - Given two `label` items for the field `Due` of `Todo`. When the checks run, then the
   findings hold the error `WRONG_CONFIG_TYPE` with the message "Todo.Due has two label
@@ -429,7 +432,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-checks.R12 · Findings come in model order, then field order
 
-Status: ready · Intents: IN-0001
+Status: built · Intents: IN-0001
 
 - Given the models `TodoList` then `Todo`, each with one error. When the checks run, then
   the `TodoList` finding comes before the `Todo` finding. (assumed)
@@ -437,7 +440,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-checks.R13 · A sort or a view that the store cannot serve fails the build
 
-Status: ready · Intents: IN-0001
+Status: built · Intents: IN-0001
 
 Wide text is never indexed, so a list cannot sort by it. A list view must be a predicate
 that the store can turn into a filter: a bool field, `not` of one, or an equality.
@@ -964,10 +967,10 @@ naming must be simple and the same everywhere.
 ````
 diff --git a/tests/Typed.Engine.Tests/CAP-checks.Tests.fs b/tests/Typed.Engine.Tests/CAP-checks.Tests.fs
 new file mode 100644
-index 0000000..359dc72
+index 0000000..107612e
 --- /dev/null
 +++ b/tests/Typed.Engine.Tests/CAP-checks.Tests.fs
-@@ -0,0 +1,379 @@
+@@ -0,0 +1,400 @@
 +namespace Typed.Engine.Tests
 +
 +open System
@@ -1110,6 +1113,17 @@ index 0000000..359dc72
 +        Assert.Contains("DateOnly", msg, StringComparison.OrdinalIgnoreCase)
 +
 +    [<Fact>]
++    let ``CAP-checks.R3 the message names the expected type DateOnly before the predicate type string`` () =
++        let item = Rule("Due", typeof<string>, (fun _ -> true), "Not valid")
++        let msg = onlyMessage ErrorCode.WRONG_CONFIG_TYPE (runAppWith [ todoSet [ item ] ])
++        // Expected shape: "... expects a predicate of type DateOnly, but the predicate takes string".
++        let expected = msg.IndexOf("DateOnly", StringComparison.Ordinal)
++        let taken = msg.IndexOf("string", StringComparison.OrdinalIgnoreCase)
++        Assert.True(expected >= 0, "The message lacks DateOnly: " + msg)
++        Assert.True(taken >= 0, "The message lacks string: " + msg)
++        Assert.True(expected < taken, "DateOnly must come before string: " + msg)
++
++    [<Fact>]
 +    let ``CAP-checks.R3 a rule predicate of type Title on Title has no such finding`` () =
 +        let item = Rule("Title", typeof<Title>, (fun _ -> true), "Not valid")
 +        let fs = runAppWith [ todoSet [ item ] ]
@@ -1240,6 +1254,16 @@ index 0000000..359dc72
 +            "Override Todo.CompletedAt label matches the default.",
 +            onlyMessage ErrorCode.REDUNDANT_OVERRIDE (runAppWith sets)
 +        )
++
++    [<Fact>]
++    let ``CAP-checks.R9 a label of lower case due is not the default and gives no warning`` () =
++        let sets = [ overrides<Todo> [ label <@ fun (t: Todo) -> t.Due @> "due" ] ]
++        Assert.Empty(withCode ErrorCode.REDUNDANT_OVERRIDE (runAppWith sets))
++
++    [<Fact>]
++    let ``CAP-checks.R9 a label of upper case DUE is not the default and gives no warning`` () =
++        let sets = [ overrides<Todo> [ label <@ fun (t: Todo) -> t.Due @> "DUE" ] ]
++        Assert.Empty(withCode ErrorCode.REDUNDANT_OVERRIDE (runAppWith sets))
 +
 +    [<Fact>]
 +    let ``CAP-checks.R9 a label that differs from the default has no warning`` () =
@@ -1506,6 +1530,17 @@ module ``CAP-checks-R3`` =
         Assert.Contains("DateOnly", msg, StringComparison.OrdinalIgnoreCase)
 
     [<Fact>]
+    let ``CAP-checks.R3 the message names the expected type DateOnly before the predicate type string`` () =
+        let item = Rule("Due", typeof<string>, (fun _ -> true), "Not valid")
+        let msg = onlyMessage ErrorCode.WRONG_CONFIG_TYPE (runAppWith [ todoSet [ item ] ])
+        // Expected shape: "... expects a predicate of type DateOnly, but the predicate takes string".
+        let expected = msg.IndexOf("DateOnly", StringComparison.Ordinal)
+        let taken = msg.IndexOf("string", StringComparison.OrdinalIgnoreCase)
+        Assert.True(expected >= 0, "The message lacks DateOnly: " + msg)
+        Assert.True(taken >= 0, "The message lacks string: " + msg)
+        Assert.True(expected < taken, "DateOnly must come before string: " + msg)
+
+    [<Fact>]
     let ``CAP-checks.R3 a rule predicate of type Title on Title has no such finding`` () =
         let item = Rule("Title", typeof<Title>, (fun _ -> true), "Not valid")
         let fs = runAppWith [ todoSet [ item ] ]
@@ -1636,6 +1671,16 @@ module ``CAP-checks-R9`` =
             "Override Todo.CompletedAt label matches the default.",
             onlyMessage ErrorCode.REDUNDANT_OVERRIDE (runAppWith sets)
         )
+
+    [<Fact>]
+    let ``CAP-checks.R9 a label of lower case due is not the default and gives no warning`` () =
+        let sets = [ overrides<Todo> [ label <@ fun (t: Todo) -> t.Due @> "due" ] ]
+        Assert.Empty(withCode ErrorCode.REDUNDANT_OVERRIDE (runAppWith sets))
+
+    [<Fact>]
+    let ``CAP-checks.R9 a label of upper case DUE is not the default and gives no warning`` () =
+        let sets = [ overrides<Todo> [ label <@ fun (t: Todo) -> t.Due @> "DUE" ] ]
+        Assert.Empty(withCode ErrorCode.REDUNDANT_OVERRIDE (runAppWith sets))
 
     [<Fact>]
     let ``CAP-checks.R9 a label that differs from the default has no warning`` () =
