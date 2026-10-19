@@ -183,7 +183,7 @@ none
 ## Check files
 
 - tests/Typed.Engine.Tests/CAP-access.Tests.fs
-- tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj: the Compile entry of this spec
+- tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj
 
 ## Steps
 
@@ -225,7 +225,8 @@ none
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-access` as the ready stage left them.
 - 2026-10-19T05:58:38+00:00 · Tests: the test writer wrote 24 checks in `CAP-access.Tests.fs`. The Interface
-  gained the `Record` entry that R4 and R5 need. Red: the checks fail to compile, because
+  gained the `Record` entry that CAP-access.R4 (read-only refusal) and R5 (owner from
+  parent) need. Red: the checks fail to compile, because
   `Typed.Engine.Access` does not exist yet. Locked at da2df15.
 ````
 
@@ -796,6 +797,18 @@ index 0000000..e1ccd6f
 +        let parent = listRecord u2 "Groceries" false
 +        let f = errorOf (ownerFor rules u1 "Todo" (Some parent))
 +        Assert.Equal(ErrorCode.NOT_FOUND, f.Code)
+diff --git a/tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj b/tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj
+index f3ba2c6..0ff181d 100644
+--- a/tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj
++++ b/tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj
+@@ -7,6 +7,7 @@
+ 
+   <ItemGroup>
+     <Compile Include="CAP-models.Tests.fs" />
++    <Compile Include="CAP-access.Tests.fs" />
+   </ItemGroup>
+ 
+   <ItemGroup>
 ````
 
 ### tests/Typed.Engine.Tests/CAP-access.Tests.fs
@@ -1008,5 +1021,33 @@ module ``CAP-access-R5`` =
         let parent = listRecord u2 "Groceries" false
         let f = errorOf (ownerFor rules u1 "Todo" (Some parent))
         Assert.Equal(ErrorCode.NOT_FOUND, f.Code)
+````
+
+### tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj
+
+````
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="CAP-models.Tests.fs" />
+    <Compile Include="CAP-access.Tests.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.6.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Typed.Engine/Typed.Engine.fsproj" />
+  </ItemGroup>
+
+</Project>
 ````
 
