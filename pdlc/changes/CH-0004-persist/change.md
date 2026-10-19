@@ -1,6 +1,6 @@
 # CH-0004 · Persist
 
-Intent: IN-0001 · Scope: CAP-persist · Status: planned · Ticket: none · Branch: none · Base: main
+Intent: IN-0001 · Scope: CAP-persist · Status: testing · Ticket: none · Branch: pdlc/CH-0004-persist · Base: pdlc/CH-0003-validate
 Tests-Locked: none
 
 ## Delivers
