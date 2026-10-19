@@ -126,31 +126,31 @@ none
 
 ## Steps
 
-### Step 1 · Each model declares one of four rules · [ ]
+### Step 1 · Each model declares one of four rules · [x]
 
 - Requirement: CAP-access.R1
 - Check: the checks named `CAP-access.R1 ...` in `tests/Typed.Engine.Tests/CAP-access.Tests.fs`
 - Done when: every check of CAP-access.R1 (each model declares one of four rules) passes
 
-### Step 2 · A read-only condition names a bool field of the parent · [ ]
+### Step 2 · A read-only condition names a bool field of the parent · [x]
 
 - Requirement: CAP-access.R2
 - Check: the checks named `CAP-access.R2 ...` in `tests/Typed.Engine.Tests/CAP-access.Tests.fs`
 - Done when: every check of CAP-access.R2 (a read-only condition names a bool field of the parent) passes
 
-### Step 3 · Only this capability can make a scope · [ ]
+### Step 3 · Only this capability can make a scope · [x]
 
 - Requirement: CAP-access.R3
 - Check: the checks named `CAP-access.R3 ...` in `tests/Typed.Engine.Tests/CAP-access.Tests.fs`
 - Done when: every check of CAP-access.R3 (only this capability can make a scope) passes
 
-### Step 4 · A change to a read-only record is refused with its reason · [ ]
+### Step 4 · A change to a read-only record is refused with its reason · [x]
 
 - Requirement: CAP-access.R4
 - Check: the checks named `CAP-access.R4 ...` in `tests/Typed.Engine.Tests/CAP-access.Tests.fs`
 - Done when: every check of CAP-access.R4 (a change to a read-only record is refused with its reason) passes
 
-### Step 5 · The owner of a child is copied from its parent · [ ]
+### Step 5 · The owner of a child is copied from its parent · [x]
 
 - Requirement: CAP-access.R5
 - Check: the checks named `CAP-access.R5 ...` in `tests/Typed.Engine.Tests/CAP-access.Tests.fs`
@@ -170,5 +170,9 @@ none
 - 2026-10-19T06:01:24+00:00 · Tests review: the first review failed on the packet, not the checks. The packet
   script diffs exact paths, and the project file entry had a suffix. With a bare path the
   second review passed with 0 problems. The reviewer listed three extra checks for
-  later: a second parent model in the reason text, a delete of a todo in an archived
-  list, and `ownerFor` with no parent.
+  later. They are a second parent model in the reason text, a delete of a todo in an
+  archived list, and `ownerFor` with no parent.
+- 2026-10-19T06:03:30+00:00 · Build: the builder wrote `Access.fs`. A first version had a public `Scope.Make`,
+  which broke CAP-access.R3 (sealed scope). The builder removed it. `Scope` is a record
+  with private fields. All 54 checks pass. The check files did not change after the lock.
+  Commit `25a51a9`.
