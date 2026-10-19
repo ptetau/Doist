@@ -1,7 +1,7 @@
 # CH-0004 · Persist
 
 Intent: IN-0001 · Scope: CAP-persist · Status: testing · Ticket: none · Branch: pdlc/CH-0004-persist · Base: pdlc/CH-0003-validate
-Tests-Locked: 1e2b637
+Tests-Locked: 81284e2
 
 ## Delivers
 
@@ -246,6 +246,9 @@ none
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-persist` as the ready stage left them.
 - 2026-10-19T06:33:28+00:00 · Tests: the test writer wrote 47 checks in `CAP-persist.Tests.fs`, on SQLite in
-  memory. The Interface settled the curried `Store.create`, the stored forms in
-  `Record.Values`, and the record shapes. Red: the checks fail to compile, because
+  memory. The Interface settled the curried `Store.create`. It also settled the stored
+  forms in `Record.Values`, and the record shapes. Red: the checks fail to compile, because
   `Typed.Engine.Persist` does not exist yet. Locked at 1e2b637.
+- 2026-10-19T06:35:42+00:00 · Tests round 1: the review failed on a helper that could loop forever, and on a
+  page-of-200 line with no proof. The test writer bounded the loop and added a 210-row
+  check. Still red: `Typed.Engine.Persist` does not exist. Locked again at 81284e2.
