@@ -93,19 +93,27 @@ module ``JOB-generate-R1`` =
     let ``JOB-generate.R1 an unsafe override on TodoList prints one warning and exits 0`` () =
         let code, lines = runConfig (withUnsafe (tempFolder ()))
         Assert.Equal(0, code)
-        Assert.Contains("warning UNSAFE_ESCAPE_HATCH Unsafe escape hatch TodoList.rawName: uses raw SQL", lines)
+        let warning = "warning UNSAFE_ESCAPE_HATCH Unsafe escape hatch TodoList.rawName: uses raw SQL"
+        Assert.Equal(1, lines |> List.filter (fun l -> l = warning) |> List.length)
         Assert.DoesNotContain(lines, fun l -> l.StartsWith "error ")
 
     [<Fact>]
     let ``JOB-generate.R1 the command frobnicate prints usage and exits 2`` () =
-        let code, stdout, stderr = runCommand [ "frobnicate" ]
+        let code, stdout, _ = runCommand [ "frobnicate" ]
         Assert.Equal(2, code)
-        Assert.Contains("usage: generate", stdout + stderr)
+        Assert.Contains("usage: generate", stdout)
 
     [<Fact>]
-    let ``JOB-generate.R1 the command prints each finding line to standard output`` () =
-        // The todo app has no finding, so run the real command on a build that adds none, and check the
-        // library entry for a finding line. The writer plays the part of standard output.
+    let ``JOB-generate.R1 the command prints the usage line to standard output and not to standard error`` () =
+        // The real todo app has no finding, so the usage line is the real output that shows the stream.
+        let code, stdout, stderr = runCommand [ "frobnicate" ]
+        Assert.Equal(2, code)
+        Assert.Contains(linesOf stdout, fun l -> l.StartsWith "usage: generate")
+        Assert.DoesNotContain("usage: generate", stderr)
+
+    [<Fact>]
+    let ``JOB-generate.R1 the library entry writes each finding line to the writer it is given`` () =
+        // The real command prints no finding for the todo app, so this check drives the library entry.
         let code, lines = runConfig (withoutTodoRule (tempFolder ()))
         Assert.Equal(1, code)
         let findings = lines |> List.filter (fun l -> l.StartsWith "error " || l.StartsWith "warning ")
@@ -165,13 +173,17 @@ module ``JOB-generate-R3`` =
         let lines = linesOf (readmeText ())
         let afterExit = lines |> List.skipWhile (fun l -> not (l.ToLowerInvariant().Contains "exit"))
         Assert.NotEmpty afterExit
-        let lineFor (code: string) =
-            afterExit
-            |> List.tryFind (fun l -> Regex.IsMatch(l, "(^|[^0-9])" + code + "([^0-9]|$)"))
+        // The code is its own token: not inside a word, a version such as net8.0, or a longer number.
+        let hasToken (code: string) (l: string) =
+            Regex.IsMatch(l, "(?<![A-Za-z0-9.])" + code + "(?![A-Za-z0-9]|\\.[0-9])")
+        // A line for one code holds no token of the other two codes, so each code needs its own line.
         let has (code: string) (words: string list) =
-            match lineFor code with
-            | Some l -> words |> List.exists (fun w -> l.ToLowerInvariant().Contains w)
-            | None -> false
+            let others = [ "0"; "1"; "2" ] |> List.filter (fun c -> c <> code)
+            afterExit
+            |> List.exists (fun l ->
+                hasToken code l
+                && others |> List.forall (fun o -> not (hasToken o l))
+                && words |> List.exists (fun w -> l.ToLowerInvariant().Contains w))
         Assert.True(has "0" [ "error"; "success"; "ok" ], "exit code 0 has no meaning in the README")
         Assert.True(has "1" [ "error" ], "exit code 1 has no meaning in the README")
         Assert.True(has "2" [ "usage"; "unknown" ], "exit code 2 has no meaning in the README")
