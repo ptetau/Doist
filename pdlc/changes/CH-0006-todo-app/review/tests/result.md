@@ -3,41 +3,41 @@ Result: fail
 Remit: tests
 
 Problems:
-- tests/Typed.Engine.Tests/CAP-todo-app.Tests.fs:962-990 · The check "CAP-todo-app.R3 the overrides of Todo are the four of the spec" does not tell `readOnly CompletedAt` from `listEdit Done`. It only checks that the two items have fields [CompletedAt; Done] in that order and that their kinds differ. A wrong version with `listEdit CompletedAt` and `readOnly Done` passes. No other R3 check covers these two items. · CAP-todo-app.R3 line 1 (the overrides of `Todo` are `readOnly CompletedAt`, `listEdit Done`, ...), and the remit rule that each check fails on a plausible wrong version.
+- tests/Typed.Engine.Tests/CAP-todo-app.Tests.fs:1081 · "CAP-todo-app.R4 ticking a todo sets CompletedAt to now" saves a todo with `CompletedAt = None`, so a hook that ignores `previous` passes all three R4 checks. The spec rule is "if `Done` changed to true, `CompletedAt` is now". A saved todo that carries a stale `CompletedAt` while `previous.Done = false` is never tested. Give the saved todo a stale `CompletedAt` (for example 2026-10-17T09:00:00Z) and expect now · CAP-todo-app.R4 line 1 and the "Wrong versions" rule.
 
 Wrong versions:
-- R1 models are User, TodoList, Todo · models list in order TodoList, User, Todo · fails (list equality)
-- R1 User fields · Subject typed Text 200 instead of 255 · fails (Text 255 assert)
-- R1 TodoList fields · Archived missing · fails (field list)
-- R1 Todo fields · Notes not optional · fails (Optional(Text 5000))
-- R1 Title default · Title is text 100 · fails (Text 200)
-- R1 Notes default · Notes is text 500 · fails (Text 5000)
-- R1 TimeZoneId default · text 32 · fails (Text 64)
-- R1 ExternalId default · hidden but not unique · fails (Assert.True(Unique))
-- R1 exactly four defaults · an extra default for Priority · fails (sorted clr names)
-- R2 exactly three rules · a fourth rule added · fails
-- R2 User self · User is owned · fails
-- R2 TodoList owned · TodoList is ownedVia · fails
-- R2 Todo rule · no read-only condition on Archived · fails (OwnedVia tuple with Some)
-- R3 Todo overrides four items · readOnly and listEdit swapped between CompletedAt and Done · passes (only the field order and "kinds differ" are checked)
-- R3 listSort · sort Due Descending · fails (Ascending)
-- R3 listColumns · Priority and Due swapped · fails (list order)
-- R3 TodoList views · Active and Archived in the wrong order · fails (name order)
-- R3 view predicates · both views are `not Archived` · fails (DoesNotContain "Not", NotEqual text)
-- R4 tick · hook uses the real clock instead of ctx.Now · fails (09:00 asserted against 2026)
-- R4 untick · CompletedAt kept when Done is false · fails (Assert.Equal None)
-- R4 stays done · hook sets CompletedAt to now on every save with Done = true · fails (context is at 12:00, expected 09:00)
-- R5 overdue · today taken in UTC · fails (due 10-18 on UTC today would not be overdue)
-- R5 done · Done ignored · fails
-- R5 due on the Auckland today · comparison is `<=` · fails (due 10-19 expected not overdue)
-- R5 no due date · no due date counts as overdue · fails
-- R6 source files · an extra `Helpers.fs` in src/Todo.App · fails (file list)
-- R6 engine checks · an access rule missing · fails (errors not empty)
+- CAP-todo-app.R1 the models are User then TodoList then Todo · models listed as Todo, TodoList, User · fails (the list order)
+- CAP-todo-app.R1 User has the fields Subject, DisplayName, and TimeZone · Subject typed as Title (text 200) · fails (Text 255 assertion)
+- CAP-todo-app.R1 TodoList has the fields Name and Archived · Archived typed as optional bool · fails (Boolean assertion)
+- CAP-todo-app.R1 Todo has its seven fields with their kinds · Notes not optional · fails (Optional(Text 5000))
+- CAP-todo-app.R1 Title is text 200, not hidden, not unique · Title text 201 · fails (Text 200)
+- CAP-todo-app.R1 Notes is text 5000, not hidden, not unique · Notes text 4000 · fails (Text 5000)
+- CAP-todo-app.R1 TimeZoneId is text 64, not hidden, not unique · TimeZoneId text 100 · fails (Text 64)
+- CAP-todo-app.R1 ExternalId is text 255, unique, and hidden · ExternalId not hidden · fails (Assert.True Hidden)
+- CAP-todo-app.R1 the type defaults hold exactly the four types with a default · an extra default for Priority · fails (the sorted name list)
+- CAP-todo-app.R2 there are exactly three access rules · a duplicate rule for Todo · fails (the sorted model names)
+- CAP-todo-app.R2 User is self · User is owned · fails
+- CAP-todo-app.R2 TodoList is owned · TodoList is system · fails
+- CAP-todo-app.R2 Todo is ownedVia List and read-only when the list is Archived · no read-only condition · fails (Some("TodoList","Archived") value)
+- CAP-todo-app.R3 the overrides of Todo are the four of the spec · listEdit on CompletedAt and readOnly on Done swapped · fails (the ReadOnly and ListEdit field lists)
+- CAP-todo-app.R3 listSort of Todo is Due ascending · Due descending · fails (Ascending assertion)
+- CAP-todo-app.R3 listColumns of Todo are Title, Due, Priority, Done in that order · Done before Priority · fails (list order)
+- CAP-todo-app.R3 the overrides of TodoList are the views Active then Archived · views in the order Archived, Active · fails (name list)
+- CAP-todo-app.R3 the Active view is not Archived and the Archived view is Archived · Active and Archived predicates swapped · fails ("Not" in the Archived text)
+- CAP-todo-app.R4 ticking a todo sets CompletedAt to now · hook ignores `previous` and keeps a stale saved `CompletedAt` · passes (the saved todo has `CompletedAt = None`)
+- CAP-todo-app.R4 unticking a todo empties CompletedAt · hook leaves CompletedAt on untick · fails (saved todo carries the old time)
+- CAP-todo-app.R4 saving a todo that stays done keeps the first CompletedAt · hook sets now whenever Done is true · fails (at 12 versus at 9)
+- CAP-todo-app.R5 an open todo due on the Auckland yesterday is overdue · hook compares to the UTC date · fails (UTC today is 10-18, so due 10-18 is not overdue)
+- CAP-todo-app.R5 a done todo due on the Auckland yesterday is not overdue · hook ignores Done · fails
+- CAP-todo-app.R5 an open todo due on the Auckland today is not overdue · hook uses `<=` · fails (due 10-19 equals today)
+- CAP-todo-app.R5 an open todo with no due date is not overdue · hook treats no due date as overdue · fails
+- CAP-todo-app.R6 the source files are Model, Defaults, Schema, and Hooks · an extra `Helpers.fs` · fails (the file list)
+- CAP-todo-app.R6 the engine checks find no error in the models, rules, and overrides · a model with no access rule · fails (non-empty errors)
 
 Follow-ups: none
 
 Notes:
-- All checks set the clock and time zone through `HookContext`, which is the named seam. No check uses the real clock.
-- The Interface lists no error codes for this change, so no code check is needed.
-- The R3 view checks read `sprintf "%A"` of a quotation. That output depends on how F# prints the quotation. It works for `not l.Archived` but is brittle.
-- I could not see the app code, so I could not check the exact field lists of the models against the spec.
+- The R3 view check reads `sprintf "%A"` of the quotation and looks for "Not". It depends on how the quotation prints. A correct `l.Archived = false` view would fail it. The line says "(not `Archived`)", so this is acceptable.
+- The check "the type defaults hold exactly the four types" goes past the acceptance line. A correct app that adds a fifth default would fail it.
+- The clock is set through `HookContext.Now` and `HookContext.TimeZone` in every R4 and R5 check. No check uses the real clock. No check waits on anything.
+- The engine items used (`Hidden`, `Unique`, `errors`, `fieldsOf`) are not in the packet. I could not verify that they exist.

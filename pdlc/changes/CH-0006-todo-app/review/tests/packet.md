@@ -62,7 +62,7 @@ Look for these traps:
 # CH-0006 · Todo app
 
 Intent: IN-0001 · Scope: CAP-todo-app · Status: building · Ticket: none · Branch: pdlc/CH-0006-todo-app · Base: pdlc/CH-0005-checks
-Tests-Locked: f558c7c075ecf41f9bb39b5328492d0b9b8c9dc9
+Tests-Locked: dfc59556260396720b743eb4ff82ef074705f7b9
 
 ## Delivers
 
@@ -818,10 +818,10 @@ naming must be simple and the same everywhere.
 ````
 diff --git a/tests/Typed.Engine.Tests/CAP-todo-app.Tests.fs b/tests/Typed.Engine.Tests/CAP-todo-app.Tests.fs
 new file mode 100644
-index 0000000..b49e154
+index 0000000..8aac4f6
 --- /dev/null
 +++ b/tests/Typed.Engine.Tests/CAP-todo-app.Tests.fs
-@@ -0,0 +1,332 @@
+@@ -0,0 +1,336 @@
 +namespace Typed.Engine.Tests
 +
 +open System
@@ -977,17 +977,21 @@ index 0000000..b49e154
 +                | ListColumns fs -> Some fs
 +                | _ -> None)
 +        Assert.Equal<string list list>([ [ "Title"; "Due"; "Priority"; "Done" ] ], columns)
-+        // The two other items are readOnly CompletedAt, then listEdit Done. They are different kinds of item.
-+        let others =
++        // The two other items are readOnly CompletedAt and listEdit Done. Match on the case, so a swap fails.
++        let readOnlys =
 +            items
-+            |> List.filter (fun i ->
++            |> List.choose (fun i ->
 +                match i with
-+                | ListSort _
-+                | ListColumns _ -> false
-+                | _ -> true)
-+        Assert.Equal<string list list>([ [ "CompletedAt" ]; [ "Done" ] ], others |> List.map fieldsOf)
-+        let kind (i: OverrideItem) = (sprintf "%A" i).Split([| ' '; '('; '\n' |]).[0]
-+        Assert.NotEqual<string>(kind others.[0], kind others.[1])
++                | ReadOnly f -> Some f
++                | _ -> None)
++        Assert.Equal<string list>([ "CompletedAt" ], readOnlys)
++        let listEdits =
++            items
++            |> List.choose (fun i ->
++                match i with
++                | ListEdit f -> Some f
++                | _ -> None)
++        Assert.Equal<string list>([ "Done" ], listEdits)
 +
 +    [<Fact>]
 +    let ``CAP-todo-app.R3 listSort of Todo is Due ascending`` () =
@@ -1334,17 +1338,21 @@ module ``CAP-todo-app-R3`` =
                 | ListColumns fs -> Some fs
                 | _ -> None)
         Assert.Equal<string list list>([ [ "Title"; "Due"; "Priority"; "Done" ] ], columns)
-        // The two other items are readOnly CompletedAt, then listEdit Done. They are different kinds of item.
-        let others =
+        // The two other items are readOnly CompletedAt and listEdit Done. Match on the case, so a swap fails.
+        let readOnlys =
             items
-            |> List.filter (fun i ->
+            |> List.choose (fun i ->
                 match i with
-                | ListSort _
-                | ListColumns _ -> false
-                | _ -> true)
-        Assert.Equal<string list list>([ [ "CompletedAt" ]; [ "Done" ] ], others |> List.map fieldsOf)
-        let kind (i: OverrideItem) = (sprintf "%A" i).Split([| ' '; '('; '\n' |]).[0]
-        Assert.NotEqual<string>(kind others.[0], kind others.[1])
+                | ReadOnly f -> Some f
+                | _ -> None)
+        Assert.Equal<string list>([ "CompletedAt" ], readOnlys)
+        let listEdits =
+            items
+            |> List.choose (fun i ->
+                match i with
+                | ListEdit f -> Some f
+                | _ -> None)
+        Assert.Equal<string list>([ "Done" ], listEdits)
 
     [<Fact>]
     let ``CAP-todo-app.R3 listSort of Todo is Due ascending`` () =
