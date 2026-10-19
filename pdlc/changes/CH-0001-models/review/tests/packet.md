@@ -61,8 +61,8 @@ Look for these traps:
 ````
 # CH-0001 · Models
 
-Intent: IN-0001 · Scope: CAP-models · Status: testing · Ticket: none · Branch: pdlc/CH-0001-models · Base: ccr-1ef8bdfa-1cxxi7
-Tests-Locked: 5dba628
+Intent: IN-0001 · Scope: CAP-models · Status: building · Ticket: none · Branch: pdlc/CH-0001-models · Base: ccr-1ef8bdfa-1cxxi7
+Tests-Locked: c61b18d
 
 ## Delivers
 
@@ -218,7 +218,7 @@ The type defaults of the todo app are these four entries, and no others. `Priori
 | `TimeZoneId` | `Text 64` | known IANA zone | false | false |
 | `ExternalId` | `Text 255` | none | true | true |
 
-The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement, named with the requirement ID in double backticks, such as ``module ``CAP-models.R1`` ``. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
+The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement, named with the requirement ID with a hyphen in place of the dot, in double backticks, such as ``module ``CAP-models-R1`` ``. F# does not allow a dot in a module name. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
 
 ### Test seams
 
@@ -291,6 +291,10 @@ none
   project. Red: `dotnet test` fails to compile, because `Typed.Engine` does not exist yet.
   Every error names a missing symbol of the Interface. No error is a fault in a check.
   Locked at 5dba628.
+- 2026-10-19T05:47:07+00:00 · Build round 1: the builder found that F# rejects a dot in a module name. The
+  test writer renamed the seven modules with a hyphen. The check names did not change.
+  The builder's engine code is in the working tree, so the checks now run. Locked again
+  at c61b18d.
 ````
 
 ## The spec it covers: title and summary
@@ -560,7 +564,7 @@ naming must be simple and the same everywhere.
 ````
 diff --git a/tests/Typed.Engine.Tests/CAP-models.Tests.fs b/tests/Typed.Engine.Tests/CAP-models.Tests.fs
 new file mode 100644
-index 0000000..f5296ec
+index 0000000..247f972
 --- /dev/null
 +++ b/tests/Typed.Engine.Tests/CAP-models.Tests.fs
 @@ -0,0 +1,271 @@
@@ -642,7 +646,7 @@ index 0000000..f5296ec
 +
 +open ModelsFixtures
 +
-+module ``CAP-models.R1`` =
++module ``CAP-models-R1`` =
 +
 +    [<Fact>]
 +    let ``CAP-models.R1 Title has kind text 200`` () =
@@ -682,7 +686,7 @@ index 0000000..f5296ec
 +        Assert.Equal(ErrorCode.WRONG_CONFIG_TYPE, fs.Head.Code)
 +        Assert.Equal("Priority is not a record type.", fs.Head.Message)
 +
-+module ``CAP-models.R2`` =
++module ``CAP-models-R2`` =
 +
 +    [<Fact>]
 +    let ``CAP-models.R2 a list of Title has no default and names each engine`` () =
@@ -705,7 +709,7 @@ index 0000000..f5296ec
 +        let names = fs |> List.map (fun f -> f.Field) |> List.sort
 +        Assert.Equal<string option list>([ Some "Aliases"; Some "Tags" ], names)
 +
-+module ``CAP-models.R3`` =
++module ``CAP-models-R3`` =
 +
 +    [<Fact>]
 +    let ``CAP-models.R3 the system field names are known`` () =
@@ -722,7 +726,7 @@ index 0000000..f5296ec
 +        for s in systemFields do
 +            Assert.DoesNotContain(s, names)
 +
-+module ``CAP-models.R4`` =
++module ``CAP-models-R4`` =
 +
 +    [<Fact>]
 +    let ``CAP-models.R4 CompletedAt gives Completed at`` () =
@@ -748,7 +752,7 @@ index 0000000..f5296ec
 +        let m = describeOk typeof<Todo>
 +        Assert.Equal("Completed at", (field m "CompletedAt").Label)
 +
-+module ``CAP-models.R5`` =
++module ``CAP-models-R5`` =
 +
 +    [<Fact>]
 +    let ``CAP-models.R5 Notes is wide`` () =
@@ -772,7 +776,7 @@ index 0000000..f5296ec
 +    let ``CAP-models.R5 a whole number is not wide`` () =
 +        Assert.False(isWide WholeNumber)
 +
-+module ``CAP-models.R6`` =
++module ``CAP-models-R6`` =
 +
 +    let private titleOf (t: Type) (items: OverrideItem list) =
 +        let m = describeOk t
@@ -795,7 +799,7 @@ index 0000000..f5296ec
 +        let mo = overrides<NoTitle> [ titleField <@ fun (n: NoTitle) -> n.Count @> ]
 +        Assert.Equal(Some "Count", titleOf typeof<NoTitle> mo.Items)
 +
-+module ``CAP-models.R7`` =
++module ``CAP-models-R7`` =
 +
 +    [<Fact>]
 +    let ``CAP-models.R7 the selector for Due reads the name Due`` () =
@@ -946,7 +950,7 @@ module ModelsFixtures =
 
 open ModelsFixtures
 
-module ``CAP-models.R1`` =
+module ``CAP-models-R1`` =
 
     [<Fact>]
     let ``CAP-models.R1 Title has kind text 200`` () =
@@ -986,7 +990,7 @@ module ``CAP-models.R1`` =
         Assert.Equal(ErrorCode.WRONG_CONFIG_TYPE, fs.Head.Code)
         Assert.Equal("Priority is not a record type.", fs.Head.Message)
 
-module ``CAP-models.R2`` =
+module ``CAP-models-R2`` =
 
     [<Fact>]
     let ``CAP-models.R2 a list of Title has no default and names each engine`` () =
@@ -1009,7 +1013,7 @@ module ``CAP-models.R2`` =
         let names = fs |> List.map (fun f -> f.Field) |> List.sort
         Assert.Equal<string option list>([ Some "Aliases"; Some "Tags" ], names)
 
-module ``CAP-models.R3`` =
+module ``CAP-models-R3`` =
 
     [<Fact>]
     let ``CAP-models.R3 the system field names are known`` () =
@@ -1026,7 +1030,7 @@ module ``CAP-models.R3`` =
         for s in systemFields do
             Assert.DoesNotContain(s, names)
 
-module ``CAP-models.R4`` =
+module ``CAP-models-R4`` =
 
     [<Fact>]
     let ``CAP-models.R4 CompletedAt gives Completed at`` () =
@@ -1052,7 +1056,7 @@ module ``CAP-models.R4`` =
         let m = describeOk typeof<Todo>
         Assert.Equal("Completed at", (field m "CompletedAt").Label)
 
-module ``CAP-models.R5`` =
+module ``CAP-models-R5`` =
 
     [<Fact>]
     let ``CAP-models.R5 Notes is wide`` () =
@@ -1076,7 +1080,7 @@ module ``CAP-models.R5`` =
     let ``CAP-models.R5 a whole number is not wide`` () =
         Assert.False(isWide WholeNumber)
 
-module ``CAP-models.R6`` =
+module ``CAP-models-R6`` =
 
     let private titleOf (t: Type) (items: OverrideItem list) =
         let m = describeOk t
@@ -1099,7 +1103,7 @@ module ``CAP-models.R6`` =
         let mo = overrides<NoTitle> [ titleField <@ fun (n: NoTitle) -> n.Count @> ]
         Assert.Equal(Some "Count", titleOf typeof<NoTitle> mo.Items)
 
-module ``CAP-models.R7`` =
+module ``CAP-models-R7`` =
 
     [<Fact>]
     let ``CAP-models.R7 the selector for Due reads the name Due`` () =
