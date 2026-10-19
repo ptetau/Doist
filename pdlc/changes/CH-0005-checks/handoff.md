@@ -1,19 +1,16 @@
-# Handoff · CH-0005 checks
+# Handoff · CH-0005 checks (show stage)
 
-## Checks
+## Built
 
-`tests/Typed.Engine.Tests/CAP-checks.Tests.fs` holds 36 checks, one module for each of CAP-checks.R1 to R13. The tests lock is in the header of `change.md`.
+`src/Typed.Engine/Checks.fs` has `Checks.run`, `errors`, and `warnings`. It covers CAP-checks.R1 to R13.
 
-## What to build
+## How to run
 
-- `src/Typed.Engine/Checks.fs` with module `Typed.Engine.Checks` and a `run` function. Add it to the fsproj after `Persist.fs`.
-- R13 uses `Persist.viewToSql`.
-- Findings come in model order, then field order.
+`dotnet test tests/Typed.Engine.Tests --filter "DisplayName~CAP-checks"` runs the 36 checks. The whole run has 176 checks.
 
-## Notes
+## Choices the spec did not fix
 
-- R3 checks that the message names `Todo.Due`, "string", and "DateOnly".
-- R9 for `CompletedAt` expects "Override Todo.CompletedAt label matches the default."
-- R7 builds `OwnedVia` and the read-only condition directly, because the selectors cannot compile with a non-reference field.
-- The spec line in R13 writes `t.Title.Length`. `Title` has no `Length`, so the check reads the inner string.
-- The other system fields (`Id`, `Owner`, `CreatedAt`, `UpdatedAt`) have no check as `SYSTEM_FIELD_TARGET` targets.
+- Findings come in model order, then field order. A finding with no field comes first. A finding with no real field comes last.
+- A system field name gives only `SYSTEM_FIELD_TARGET`, not `MISSING_FIELD` too.
+- A type with no default adds its `MISSING_DEFAULT` finding to the result.
+- R11 also covers `hiddenInForm`, `readOnly`, `listEdit`, `sensitive`, and `column`.

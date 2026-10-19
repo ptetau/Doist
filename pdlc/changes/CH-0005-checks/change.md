@@ -1,6 +1,6 @@
 # CH-0005 · Checks
 
-Intent: IN-0001 · Scope: CAP-checks · Status: building · Ticket: none · Branch: pdlc/CH-0005-checks · Base: pdlc/CH-0004-persist
+Intent: IN-0001 · Scope: CAP-checks · Status: built · Ticket: none · Branch: pdlc/CH-0005-checks · Base: pdlc/CH-0004-persist
 Tests-Locked: 09ce3bfba7806424b1e5c4c262c49dde5bc47552
 
 ## Delivers
@@ -233,3 +233,4 @@ none
 ## Progress log
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-checks` as the ready stage left them.
+- Built: 176 checks pass (36 new). The builder added Checks.fs and its Compile entry.
