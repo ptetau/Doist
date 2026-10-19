@@ -100,6 +100,11 @@ module ``CAP-validate-R2`` =
         Assert.Empty(listErrors (listNamed "  Groceries  "))
 
     [<Fact>]
+    let ``CAP-validate.R2 parseField trims the title`` () =
+        let v = parseOk (todoField "Title") (Some "  Groceries  ")
+        Assert.Equal(box (Title "Groceries"), v)
+
+    [<Fact>]
     let ``CAP-validate.R2 a name of spaces only is required`` () =
         Assert.Equal<FieldError list>(
             [ { Field = "Name"; Message = "is required" } ],
