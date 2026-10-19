@@ -61,8 +61,8 @@ Look for these traps:
 ````
 # CH-0003 · Validate
 
-Intent: IN-0001 · Scope: CAP-validate · Status: testing · Ticket: none · Branch: pdlc/CH-0003-validate · Base: pdlc/CH-0002-access
-Tests-Locked: 7fab997
+Intent: IN-0001 · Scope: CAP-validate · Status: building · Ticket: none · Branch: pdlc/CH-0003-validate · Base: pdlc/CH-0002-access
+Tests-Locked: 6f34681
 
 ## Delivers
 
@@ -190,9 +190,11 @@ The todo app's defaults are these, and the checks declare them in the check file
 
 ```fsharp
 let oneLine (s: string) = if s.IndexOfAny([| '\r'; '\n' |]) >= 0 then [ "must be on one line" ] else []
+// An exact match on the zone id. FindSystemTimeZoneById ignores case on Linux, so it is
+// not used here.
 let knownZone (s: string) =
-    try TimeZoneInfo.FindSystemTimeZoneById s |> ignore; []
-    with _ -> [ "must be a known time zone, such as Pacific/Auckland" ]
+    if TimeZoneInfo.GetSystemTimeZones() |> Seq.exists (fun z -> z.Id = s) then []
+    else [ "must be a known time zone, such as Pacific/Auckland" ]
 
 let defaults : TypeDefault list =
     [ { Clr = typeof<Title>;      Kind = Text 200;  Check = oneLine;        Hidden = false; Unique = false }
@@ -281,6 +283,10 @@ none
   gained the paragraph on where the rules come from, with the todo app defaults. Red: the
   checks fail to compile, because `Typed.Engine.Validate` does not exist yet. Locked at
   7fab997.
+- 2026-10-19T06:15:23+00:00 · Build round 1: the builder found that `knownZone` in the Interface accepted
+  "pacific/auckland" on Linux, so one R4 check failed against correct code. The rule now
+  matches the zone id exactly. The test writer mirrored it. All 87 checks pass with the
+  builder's code. Locked again at 6f34681.
 ````
 
 ## The spec it covers: title and summary
@@ -685,7 +691,7 @@ naming must be simple and the same everywhere.
 ````
 diff --git a/tests/Typed.Engine.Tests/CAP-validate.Tests.fs b/tests/Typed.Engine.Tests/CAP-validate.Tests.fs
 new file mode 100644
-index 0000000..b305c51
+index 0000000..7483ac1
 --- /dev/null
 +++ b/tests/Typed.Engine.Tests/CAP-validate.Tests.fs
 @@ -0,0 +1,273 @@
@@ -704,8 +710,8 @@ index 0000000..b305c51
 +    let oneLine (s: string) = if s.IndexOfAny([| '\r'; '\n' |]) >= 0 then [ "must be on one line" ] else []
 +
 +    let knownZone (s: string) =
-+        try TimeZoneInfo.FindSystemTimeZoneById s |> ignore; []
-+        with _ -> [ "must be a known time zone, such as Pacific/Auckland" ]
++        if TimeZoneInfo.GetSystemTimeZones() |> Seq.exists (fun z -> z.Id = s) then []
++        else [ "must be a known time zone, such as Pacific/Auckland" ]
 +
 +    /// The defaults of the todo app, with the rule of each type, as the spec writes them.
 +    let defaults : TypeDefault list =
@@ -994,8 +1000,8 @@ module ValidateFixtures =
     let oneLine (s: string) = if s.IndexOfAny([| '\r'; '\n' |]) >= 0 then [ "must be on one line" ] else []
 
     let knownZone (s: string) =
-        try TimeZoneInfo.FindSystemTimeZoneById s |> ignore; []
-        with _ -> [ "must be a known time zone, such as Pacific/Auckland" ]
+        if TimeZoneInfo.GetSystemTimeZones() |> Seq.exists (fun z -> z.Id = s) then []
+        else [ "must be a known time zone, such as Pacific/Auckland" ]
 
     /// The defaults of the todo app, with the rule of each type, as the spec writes them.
     let defaults : TypeDefault list =
