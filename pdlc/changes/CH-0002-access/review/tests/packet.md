@@ -61,8 +61,8 @@ Look for these traps:
 ````
 # CH-0002 · Access
 
-Intent: IN-0001 · Scope: CAP-access · Status: testing · Ticket: none · Branch: pdlc/CH-0002-access · Base: pdlc/CH-0001-models
-Tests-Locked: da2df15
+Intent: IN-0001 · Scope: CAP-access · Status: in review · Ticket: none · Branch: pdlc/CH-0002-access · Base: pdlc/CH-0001-models
+Tests-Locked: a042dce
 
 ## Delivers
 
@@ -187,31 +187,31 @@ none
 
 ## Steps
 
-### Step 1 · Each model declares one of four rules · [ ]
+### Step 1 · Each model declares one of four rules · [x]
 
 - Requirement: CAP-access.R1
 - Check: the checks named `CAP-access.R1 ...` in `tests/Typed.Engine.Tests/CAP-access.Tests.fs`
 - Done when: every check of CAP-access.R1 (each model declares one of four rules) passes
 
-### Step 2 · A read-only condition names a bool field of the parent · [ ]
+### Step 2 · A read-only condition names a bool field of the parent · [x]
 
 - Requirement: CAP-access.R2
 - Check: the checks named `CAP-access.R2 ...` in `tests/Typed.Engine.Tests/CAP-access.Tests.fs`
 - Done when: every check of CAP-access.R2 (a read-only condition names a bool field of the parent) passes
 
-### Step 3 · Only this capability can make a scope · [ ]
+### Step 3 · Only this capability can make a scope · [x]
 
 - Requirement: CAP-access.R3
 - Check: the checks named `CAP-access.R3 ...` in `tests/Typed.Engine.Tests/CAP-access.Tests.fs`
 - Done when: every check of CAP-access.R3 (only this capability can make a scope) passes
 
-### Step 4 · A change to a read-only record is refused with its reason · [ ]
+### Step 4 · A change to a read-only record is refused with its reason · [x]
 
 - Requirement: CAP-access.R4
 - Check: the checks named `CAP-access.R4 ...` in `tests/Typed.Engine.Tests/CAP-access.Tests.fs`
 - Done when: every check of CAP-access.R4 (a change to a read-only record is refused with its reason) passes
 
-### Step 5 · The owner of a child is copied from its parent · [ ]
+### Step 5 · The owner of a child is copied from its parent · [x]
 
 - Requirement: CAP-access.R5
 - Check: the checks named `CAP-access.R5 ...` in `tests/Typed.Engine.Tests/CAP-access.Tests.fs`
@@ -228,6 +228,22 @@ none
   gained the `Record` entry that CAP-access.R4 (read-only refusal) and R5 (owner from
   parent) need. Red: the checks fail to compile, because
   `Typed.Engine.Access` does not exist yet. Locked at da2df15.
+- 2026-10-19T06:01:24+00:00 · Tests review: the first review failed on the packet, not the checks. The packet
+  script diffs exact paths, and the project file entry had a suffix. With a bare path the
+  second review passed with 0 problems. The reviewer listed three extra checks for
+  later. They are a second parent model in the reason text, a delete of a todo in an
+  archived list, and `ownerFor` with no parent.
+- 2026-10-19T06:03:30+00:00 · Build: the builder wrote `Access.fs`. A first version had a public `Scope.Make`,
+  which broke CAP-access.R3 (sealed scope). The builder removed it. `Scope` is a record
+  with private fields. All 54 checks pass. The check files did not change after the lock.
+  Commit `25a51a9`.
+- 2026-10-19T06:07:18+00:00 · Verify round 1: 54 of 54 checks pass, one group for each requirement. The
+  check files did not change after the lock. Specification, security, quality, and
+  privacy passed with 0 problems. Compliance does not apply. Filed IN-0007 (checkChange
+  fails closed) from the security follow-ups.
+- 2026-10-19T06:08:35+00:00 · Gate correction: the gate read a wrong version in the tests review that still
+  passed, a hard-coded reason. The test writer added a check with a second parent model
+  and field. It passes, because the code derives the reason. Locked again at a042dce.
 ````
 
 ## The spec it covers: title and summary
@@ -253,7 +269,7 @@ scope of a caller is not found.
 
 ### CAP-access.R1 · Each model declares one of four rules
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given `rule<TodoList> owned`, when a caller reads the rule, then the model name is
   "TodoList" and the access is `Owned`.
@@ -265,7 +281,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-access.R2 · A read-only condition names a bool field of the parent
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given `ownedVia <@ fun t -> t.List @> |> readOnlyWhenParent <@ fun l -> l.Archived @>`,
   when a caller reads the rule, then the read-only condition names the model "TodoList"
@@ -276,7 +292,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-access.R3 · Only this capability can make a scope
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 A scope is an owner filter, a self scope, or the engine-only scope. The scope type has a private
 constructor. Other code cannot make one.
@@ -295,7 +311,7 @@ constructor. Other code cannot make one.
 
 ### CAP-access.R4 · A change to a read-only record is refused with its reason
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the list "Old" with `Archived = true`. When the engine checks a change to a todo of
   that list, then the result is the error `READ_ONLY_RECORD`. The reason is "This list is
@@ -312,7 +328,7 @@ Status: ready · Intents: IN-0001
 
 ### CAP-access.R5 · The owner of a child is copied from its parent
 
-Status: ready · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a user `u1` and a list owned by `u1`. When the engine decides the owner of a new
   todo in that list, then the owner is `u1`.
@@ -586,10 +602,10 @@ naming must be simple and the same everywhere.
 ````
 diff --git a/tests/Typed.Engine.Tests/CAP-access.Tests.fs b/tests/Typed.Engine.Tests/CAP-access.Tests.fs
 new file mode 100644
-index 0000000..e1ccd6f
+index 0000000..e75987e
 --- /dev/null
 +++ b/tests/Typed.Engine.Tests/CAP-access.Tests.fs
-@@ -0,0 +1,207 @@
+@@ -0,0 +1,231 @@
 +namespace Typed.Engine.Tests
 +
 +open System
@@ -605,6 +621,11 @@ index 0000000..e1ccd6f
 +
 +    /// The model has no rule in any list below.
 +    type Unruled = { Name: string }
++
++    /// A second parent model, to pin the reason rule.
++    type Project = { Code: Title; Closed: bool }
++
++    type Task = { Project: Ref<Project>; Title: Title }
 +
 +    let u1 = Guid.Parse "11111111-1111-1111-1111-111111111111"
 +    let u2 = Guid.Parse "22222222-2222-2222-2222-222222222222"
@@ -776,6 +797,25 @@ index 0000000..e1ccd6f
 +        let parent = listRecord u1 "Groceries" false
 +        okUnit (checkChange rules Create "Todo" (Some parent))
 +
++    [<Fact>]
++    let ``CAP-access.R4 the reason comes from the parent model and field`` () =
++        let projectRules =
++            [ rule<Task> (
++                  ownedVia <@ fun (t: Task) -> t.Project @>
++                  |> readOnlyWhenParent <@ fun (p: Project) -> p.Closed @>
++              ) ]
++
++        let parent: Record =
++            { Model = "Project"
++              Id = Guid.NewGuid()
++              Owner = Some u1
++              Version = 1L
++              Values = Map [ "Closed", box true ] }
++
++        let f = errorOf (checkChange projectRules Change "Task" (Some parent))
++        Assert.Equal(ErrorCode.READ_ONLY_RECORD, f.Code)
++        Assert.Equal("This project is closed", f.Message)
++
 +module ``CAP-access-R5`` =
 +
 +    [<Fact>]
@@ -829,6 +869,11 @@ module AccessFixtures =
 
     /// The model has no rule in any list below.
     type Unruled = { Name: string }
+
+    /// A second parent model, to pin the reason rule.
+    type Project = { Code: Title; Closed: bool }
+
+    type Task = { Project: Ref<Project>; Title: Title }
 
     let u1 = Guid.Parse "11111111-1111-1111-1111-111111111111"
     let u2 = Guid.Parse "22222222-2222-2222-2222-222222222222"
@@ -999,6 +1044,25 @@ module ``CAP-access-R4`` =
     let ``CAP-access.R4 creation of a todo in a live list passes`` () =
         let parent = listRecord u1 "Groceries" false
         okUnit (checkChange rules Create "Todo" (Some parent))
+
+    [<Fact>]
+    let ``CAP-access.R4 the reason comes from the parent model and field`` () =
+        let projectRules =
+            [ rule<Task> (
+                  ownedVia <@ fun (t: Task) -> t.Project @>
+                  |> readOnlyWhenParent <@ fun (p: Project) -> p.Closed @>
+              ) ]
+
+        let parent: Record =
+            { Model = "Project"
+              Id = Guid.NewGuid()
+              Owner = Some u1
+              Version = 1L
+              Values = Map [ "Closed", box true ] }
+
+        let f = errorOf (checkChange projectRules Change "Task" (Some parent))
+        Assert.Equal(ErrorCode.READ_ONLY_RECORD, f.Code)
+        Assert.Equal("This project is closed", f.Message)
 
 module ``CAP-access-R5`` =
 

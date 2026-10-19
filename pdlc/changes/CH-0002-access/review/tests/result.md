@@ -5,39 +5,39 @@ Remit: tests
 Problems: none
 
 Wrong versions:
-- CAP-access.R1 owned gives model TodoList and access Owned · rule returns the wrong model name or Self for owned · fails (the ModelName and Access asserts)
-- CAP-access.R1 ownedVia gives reference List and parent TodoList · parent or reference left empty or swapped · fails (the exact `OwnedVia("List", "TodoList", None)` value)
-- CAP-access.R1 self gives access Self · self returns Owned · fails
-- CAP-access.R1 system gives access SystemOnly · system returns Self · fails
-- CAP-access.R2 readOnlyWhenParent names TodoList and Archived · the condition keeps the child model name or drops the field · fails (the `Some("TodoList", "Archived")` value)
-- CAP-access.R2 readOnlyWhenParent on owned fails with its message · only throws for some accesses, or a different message · fails (exact message)
-- CAP-access.R2 readOnlyWhenParent on self fails with its message · self passes through unchanged · fails
-- CAP-access.R2 readOnlyWhenParent on system fails with its message · system passes through unchanged · fails
-- CAP-access.R3 TodoList scope is the owner filter for u1 · scope is SelfFilter or Engine · fails
-- CAP-access.R3 the owner filter follows the user · the user id is hard-coded or taken from the first call · fails (u2 case)
-- CAP-access.R3 User scope is the self scope for u1 · self gives OwnerFilter · fails
-- CAP-access.R3 Todo with ownedVia scope is the owner filter for u1 · ownedVia gives SelfFilter or an error · fails
-- CAP-access.R3 Audit with system gives NOT_FOUND · system gives Engine scope or another code · fails (exact code)
-- CAP-access.R3 a model with no rule gives NOT_FOUND · a missing rule gives the owner filter (allow by default) · fails (Unruled)
-- CAP-access.R3 the engine scope is the engine-only scope · engineScope has kind OwnerFilter · fails
-- CAP-access.R4 change to a todo of an archived list gives READ_ONLY_RECORD · the read-only check is skipped for Change · fails (code and message)
-- CAP-access.R4 change to a todo of a live list passes · the check refuses every change · fails
-- CAP-access.R4 delete of an archived list itself passes · Delete of a model with no parent returns an error · fails
-- CAP-access.R4 change to a todo whose list does not exist gives NOT_FOUND · a missing parent passes · fails
-- CAP-access.R4 creation of a todo in an archived list gives READ_ONLY_RECORD · the check skips Create · fails
-- CAP-access.R4 creation of a todo in a live list passes · Create always refused · fails
-- CAP-access.R5 todo in a list owned by u1 gets owner u1 · the owner is a new Guid or None · fails
-- CAP-access.R5 the owner follows the parent and user · the owner is hard-coded to u1 · fails (u2 case)
-- CAP-access.R5 todo in a list owned by u2 for user u1 gives NOT_FOUND · the parent owner is not compared to the user · fails
-- CAP-access.R4 change to a todo of an archived list gives READ_ONLY_RECORD · the code hard-codes "This list is archived" instead of deriving it from the parent model and field · passes (only one parent model and field exists; the derivation rule is marked assumed, so this is not a problem)
+- CAP-access.R1 owned gives model TodoList and access Owned · rule returns a wrong model name or `Self` · fails (Assert on "TodoList" and `Owned`)
+- CAP-access.R1 ownedVia gives reference List and parent TodoList · parent is taken from the model name, or the reference is empty · fails (exact `OwnedVia("List", "TodoList", None)`)
+- CAP-access.R1 self gives access Self · self maps to `Owned` · fails
+- CAP-access.R1 system gives access SystemOnly · system maps to `Self` · fails
+- CAP-access.R2 readOnlyWhenParent names TodoList and Archived · the condition stores the child model or a fixed field · fails (exact `Some("TodoList","Archived")`)
+- CAP-access.R2 on owned fails with its message · the call returns the access unchanged for `Owned` · fails (`Assert.Throws`)
+- CAP-access.R2 on self fails with its message · the guard covers only `Owned` · fails
+- CAP-access.R2 on system fails with its message · the guard covers only `Owned` and `Self` · fails
+- CAP-access.R3 TodoList scope is the owner filter for u1 · `scopeFor` returns `Engine` · fails
+- CAP-access.R3 the owner filter follows the user · `scopeFor` hard-codes the user id · fails (u2 case)
+- CAP-access.R3 User scope is the self scope for u1 · `self` gives `OwnerFilter` · fails
+- CAP-access.R3 Todo with ownedVia scope is the owner filter for u1 · `ownedVia` gives `SelfFilter` or an error · fails
+- CAP-access.R3 Audit with system gives NOT_FOUND · `system` gives `Engine` scope or another code · fails (exact `NOT_FOUND`)
+- CAP-access.R3 a model with no rule gives NOT_FOUND · an unruled model gets an owner filter (open by default) · fails
+- CAP-access.R3 the engine scope is the engine-only scope · `engineScope` has kind `OwnerFilter Guid.Empty` · fails
+- CAP-access.R4 change to a todo of an archived list gives READ_ONLY_RECORD · `checkChange` ignores the condition · fails (code and message)
+- CAP-access.R4 change to a todo of a live list passes · `checkChange` refuses every change with a parent · fails
+- CAP-access.R4 delete of an archived list itself passes · the check applies the condition to the `TodoList` rule · fails only if that rule were refused; `Owned` has no condition, so a plausible wrong version that refuses all `Delete` is caught · fails
+- CAP-access.R4 change to a todo whose list does not exist gives NOT_FOUND · a missing parent returns `Ok` · fails
+- CAP-access.R4 creation of a todo in an archived list gives READ_ONLY_RECORD · `Create` skips the condition · fails
+- CAP-access.R4 creation of a todo in a live list passes · `Create` always refuses · fails
+- CAP-access.R4 the reason comes from the parent model and field · the reason is hard-coded "This list is archived" or reads `Archived` · fails (Project/Closed gives "This project is closed")
+- CAP-access.R5 todo in a list owned by u1 gets owner u1 · `ownerFor` returns a new Guid · fails
+- CAP-access.R5 the owner follows the parent and user · `ownerFor` returns a fixed u1 · fails (u2 case)
+- CAP-access.R5 todo in a list owned by u2 for user u1 gives NOT_FOUND · `ownerFor` returns the parent owner with no user check · fails
 
 Follow-ups:
-- Add a check that gives the reason for a second parent model and field, such as a "Project" with "Closed". It would prove that the reason comes from the parent word and the field name, not from a fixed string.
-- Add a check for a Delete of a todo in an archived list. The spec does not say whether it passes.
-- Add a check for `ownerFor` with no parent (NOT_FOUND). The spec lists no acceptance line for it.
+- Add a check that `checkChange` for `Delete` of a todo in an archived list is refused (or passes, as a new rule decides). The spec has no line for it. A new intent could set the rule.
+- Add a check that `ownerFor` with no parent gives `NOT_FOUND`. The spec has no line for it.
+- Add a compile-time proof that no other module can make a `Scope`. The R3 title asks for a sealed type, but no acceptance line states it.
 
 Notes:
-- The change has no clock, randomness, or vendor, so "Test seams: none" holds. No check can hang, since each is a pure call.
-- The private constructor of `Scope` is a compile-time rule. A runtime check cannot prove it, and no acceptance line asks for one.
-- Each check name starts with its requirement ID, and each module carries the ID with a hyphen. Both follow DES-pdlc-check-tagging.
-- The fixtures `Todo`, `TodoList`, and `User` come from `ModelsFixtures` of CH-0001. They are not in the packet, so I could not see that `TodoList` has `Archived`.
+- Every acceptance line of R1 to R5 has at least one check. The names carry the requirement ID and each module is named with the ID.
+- No line depends on time, randomness, or a vendor. The Interface lists no seams, and the checks use none.
+- The two error codes in the Interface, `NOT_FOUND` and `READ_ONLY_RECORD`, each have a check with the exact code.
+- The delete line (R4, third) uses a `TodoList` with no parent, so it proves that `Delete` of an `Owned` model passes. It does not prove the archived state of the record. The line is met as written.
