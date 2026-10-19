@@ -1,7 +1,7 @@
 # CH-0003 · Validate
 
 Intent: IN-0001 · Scope: CAP-validate · Status: in review · Ticket: none · Branch: pdlc/CH-0003-validate · Base: pdlc/CH-0002-access
-Tests-Locked: 6f34681
+Tests-Locked: 461fba1
 
 ## Delivers
 
@@ -238,3 +238,6 @@ none
 - 2026-10-19T06:26:52+00:00 · Verify round 2: 87 of 87 checks pass, one group for each requirement. All four
   remits that apply passed with 0 problems. The follow-ups repeat IN-0008 (parse messages
   for all kinds), IN-0009 (parseField length), and IN-0010 (validate never raises).
+- 2026-10-19T06:27:54+00:00 · Gate correction: the gate read a wrong version in the tests review that one check
+  did not catch, an untrimmed title under 200 characters. The test writer added a check
+  that `parseField` trims the title. It passes. Locked again at 461fba1.
