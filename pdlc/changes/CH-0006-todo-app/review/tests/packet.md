@@ -62,7 +62,7 @@ Look for these traps:
 # CH-0006 · Todo app
 
 Intent: IN-0001 · Scope: CAP-todo-app · Status: building · Ticket: none · Branch: pdlc/CH-0006-todo-app · Base: pdlc/CH-0005-checks
-Tests-Locked: dfc59556260396720b743eb4ff82ef074705f7b9
+Tests-Locked: 3e52d322a80fce1c8d63131adbf5daa3d79f81c2
 
 ## Delivers
 
@@ -818,10 +818,10 @@ naming must be simple and the same everywhere.
 ````
 diff --git a/tests/Typed.Engine.Tests/CAP-todo-app.Tests.fs b/tests/Typed.Engine.Tests/CAP-todo-app.Tests.fs
 new file mode 100644
-index 0000000..8aac4f6
+index 0000000..d8bee7d
 --- /dev/null
 +++ b/tests/Typed.Engine.Tests/CAP-todo-app.Tests.fs
-@@ -0,0 +1,336 @@
+@@ -0,0 +1,338 @@
 +namespace Typed.Engine.Tests
 +
 +open System
@@ -1081,7 +1081,9 @@ index 0000000..8aac4f6
 +    let ``CAP-todo-app.R4 ticking a todo sets CompletedAt to now`` () =
 +        let ctx = contextAt "UTC" (at 9)
 +        let previous = todo false None None
-+        let saved = todo true None None
++        // The saved todo carries a stale time from the day before, so the hook must replace it with now.
++        let stale = DateTimeOffset(2026, 10, 17, 9, 0, 0, TimeSpan.Zero)
++        let saved = todo true (Some stale) None
 +        let result = Todo.App.Hooks.completionTime ctx (Some previous) saved
 +        Assert.Equal(Some(at 9), result.CompletedAt)
 +        Assert.True(result.Done)
@@ -1442,7 +1444,9 @@ module ``CAP-todo-app-R4`` =
     let ``CAP-todo-app.R4 ticking a todo sets CompletedAt to now`` () =
         let ctx = contextAt "UTC" (at 9)
         let previous = todo false None None
-        let saved = todo true None None
+        // The saved todo carries a stale time from the day before, so the hook must replace it with now.
+        let stale = DateTimeOffset(2026, 10, 17, 9, 0, 0, TimeSpan.Zero)
+        let saved = todo true (Some stale) None
         let result = Todo.App.Hooks.completionTime ctx (Some previous) saved
         Assert.Equal(Some(at 9), result.CompletedAt)
         Assert.True(result.Done)
