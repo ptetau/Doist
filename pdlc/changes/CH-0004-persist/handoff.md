@@ -1,21 +1,31 @@
-# Handoff · CH-0004 · tests → build
+# Handoff · CH-0004 · build → show
 
-Time: 2026-10-19T06:39:33+00:00
+Time: 2026-10-19T06:46:50+00:00
 
 ## Done
 
-The test writer wrote 49 checks in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`, one
-module for each of CAP-persist.R1 (tables) to R8 (migration drop). They run on SQLite in
-memory. The checks are red: `Typed.Engine.Persist` does not exist yet. The lock is
-`bbd2344`. The tests review passed on the third round.
+The builder wrote `src/Typed.Engine/Persist.fs` and added it to the project. All 139
+checks pass, 49 of them for CAP-persist.R1 (tables) to R8 (migration drop). The check
+files did not change after the lock `bbd2344`. The build commit is `066a033`. The eight
+requirements are `built`.
 
 ## Decided on defaults
 
-- `Store.create conn dialect now hook` is curried, with `hook: (int -> unit) option`
-  (assumed)
-- `Record.Values` holds each field in its stored form, as the Interface lists (assumed)
-- `migration` is pure. The caller writes the shape with `writeShape` (assumed)
-- `Shape` and `Rename` are F# records, so they compare by value (assumed)
+The builder decided these where the Interface was silent. The verify reviewers must weigh
+each one:
+
+- `find`, `add`, `revise`, and `remove` use the field name as the column name. They do
+  not follow the `column` override. `page` and the schema do (assumed by the builder)
+- `page` with the engine scope gives `NOT_FOUND`, because its query always filters by
+  owner (assumed by the builder)
+- `listQuery` raises on an unknown or unsupported view name. `viewToSql` is the call that
+  gives the reason as a value (assumed by the builder)
+- `migration` does not drop a table that is missing from the next shape, and ignores a
+  changed column type. No line covers either (assumed by the builder)
+- `schema Sqlite` omits the foreign keys, because SQLite has no `ADD CONSTRAINT` (assumed
+  by the builder)
+- Only the SQLite path ran under the checks. On SQL Server the store leaves `Version` to
+  the `rowversion` column (assumed by the builder)
 
 ## Open
 
@@ -23,18 +33,15 @@ memory. The checks are red: `Typed.Engine.Persist` does not exist yet. The lock 
 
 ## Look here
 
-- pdlc/changes/CH-0004-persist/change.md (Interface, Test seams, Files)
-- tests/Typed.Engine.Tests/CAP-persist.Tests.fs (what the code must satisfy)
-- src/Typed.Engine/Model.fs, Overrides.fs, Access.fs (`Record`, `Scope.Kind`, `Access`)
+- src/Typed.Engine/Persist.fs (what to show)
+- tests/Typed.Engine.Tests/CAP-persist.Tests.fs (the 49 checks and the `PersistFixtures`)
 
 ## Don't redo
 
-- The checks. They are locked. Only the test writer changes them.
+- The checks and the build. Both are committed and pass.
 
 ## Next: do this first
 
-Add `Persist.fs` after `Validate.fs` in `src/Typed.Engine/Typed.Engine.fsproj`. The store
-runs on any `DbConnection`. For `Dialect.Sqlite`, `TOP (@n)` becomes `LIMIT @n`,
-`rowversion` becomes an integer `Version` column, and `[HasDue]` is a generated column.
-The engine project needs no SQLite package. Read the checks' `PersistFixtures` for the
-exact calls. Make the 49 checks pass with `dotnet test tests/Typed.Engine.Tests`.
+Record the terminal with one `dotnet fsi` call for each acceptance line, as the earlier
+changes did, then the CAP-persist checks. The store lines run on SQLite in memory inside
+the script.

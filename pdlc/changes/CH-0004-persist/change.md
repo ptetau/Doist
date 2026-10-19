@@ -199,49 +199,49 @@ The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requi
 
 ## Steps
 
-### Step 1 · Each model gets a table with its system columns · [ ]
+### Step 1 · Each model gets a table with its system columns · [x]
 
 - Requirement: CAP-persist.R1
 - Check: the checks named `CAP-persist.R1 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R1 (each model gets a table with its system columns) passes
 
-### Step 2 · Foreign keys are indexed and never cascade · [ ]
+### Step 2 · Foreign keys are indexed and never cascade · [x]
 
 - Requirement: CAP-persist.R2
 - Check: the checks named `CAP-persist.R2 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R2 (foreign keys are indexed and never cascade) passes
 
-### Step 3 · Each list query gets one index · [ ]
+### Step 3 · Each list query gets one index · [x]
 
 - Requirement: CAP-persist.R3
 - Check: the checks named `CAP-persist.R3 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R3 (each list query gets one index) passes
 
-### Step 4 · Every list query filters by owner and names its columns · [ ]
+### Step 4 · Every list query filters by owner and names its columns · [x]
 
 - Requirement: CAP-persist.R4
 - Check: the checks named `CAP-persist.R4 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R4 (every list query filters by owner and names its columns) passes
 
-### Step 5 · Keyset paging returns each record one time · [ ]
+### Step 5 · Keyset paging returns each record one time · [x]
 
 - Requirement: CAP-persist.R5
 - Check: the checks named `CAP-persist.R5 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R5 (keyset paging returns each record one time) passes
 
-### Step 6 · Deleting a parent deletes its children in one transaction · [ ]
+### Step 6 · Deleting a parent deletes its children in one transaction · [x]
 
 - Requirement: CAP-persist.R6
 - Check: the checks named `CAP-persist.R6 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R6 (deleting a parent deletes its children in one transaction) passes
 
-### Step 7 · A stale save fails with a conflict · [ ]
+### Step 7 · A stale save fails with a conflict · [x]
 
 - Requirement: CAP-persist.R7
 - Check: the checks named `CAP-persist.R7 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
 - Done when: every check of CAP-persist.R7 (a stale save fails with a conflict) passes
 
-### Step 8 · A migration never drops a column without a note · [ ]
+### Step 8 · A migration never drops a column without a note · [x]
 
 - Requirement: CAP-persist.R8
 - Check: the checks named `CAP-persist.R8 ...` in `tests/Typed.Engine.Tests/CAP-persist.Tests.fs`
@@ -266,3 +266,6 @@ none
   proof. The
   Interface now names `writeShape` as that step. The test writer fixed both. Locked again
   at bbd2344.
+- 2026-10-19T06:46:50+00:00 · Build: the builder wrote `Persist.fs`. All 139 checks pass. The check files did
+  not change after the lock. Commit `066a033`. The builder named six points where the
+  Interface was silent. They are in the handoff for the verify reviewers.
