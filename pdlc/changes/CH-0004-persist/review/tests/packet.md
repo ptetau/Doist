@@ -62,7 +62,7 @@ Look for these traps:
 # CH-0004 · Persist
 
 Intent: IN-0001 · Scope: CAP-persist · Status: testing · Ticket: none · Branch: pdlc/CH-0004-persist · Base: pdlc/CH-0003-validate
-Tests-Locked: 1e2b637
+Tests-Locked: 81284e2
 
 ## Delivers
 
@@ -307,9 +307,12 @@ none
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-persist` as the ready stage left them.
 - 2026-10-19T06:33:28+00:00 · Tests: the test writer wrote 47 checks in `CAP-persist.Tests.fs`, on SQLite in
-  memory. The Interface settled the curried `Store.create`, the stored forms in
-  `Record.Values`, and the record shapes. Red: the checks fail to compile, because
+  memory. The Interface settled the curried `Store.create`. It also settled the stored
+  forms in `Record.Values`, and the record shapes. Red: the checks fail to compile, because
   `Typed.Engine.Persist` does not exist yet. Locked at 1e2b637.
+- 2026-10-19T06:35:42+00:00 · Tests round 1: the review failed on a helper that could loop forever, and on a
+  page-of-200 line with no proof. The test writer bounded the loop and added a 210-row
+  check. Still red: `Typed.Engine.Persist` does not exist. Locked again at 81284e2.
 ````
 
 ## The spec it covers: title and summary
@@ -853,10 +856,10 @@ naming must be simple and the same everywhere.
 ````
 diff --git a/tests/Typed.Engine.Tests/CAP-persist.Tests.fs b/tests/Typed.Engine.Tests/CAP-persist.Tests.fs
 new file mode 100644
-index 0000000..fa437ec
+index 0000000..b5eb7c8
 --- /dev/null
 +++ b/tests/Typed.Engine.Tests/CAP-persist.Tests.fs
-@@ -0,0 +1,632 @@
+@@ -0,0 +1,645 @@
 +namespace Typed.Engine.Tests
 +
 +open System
@@ -1262,6 +1265,17 @@ index 0000000..fa437ec
 +        Assert.Equal(25, p.Rows.Length)
 +        Assert.Equal(1, queryCount store - before)
 +
++    [<Fact>]
++    let ``CAP-persist.R5 a page of 200 holds 200 of 210 todos`` () =
++        use conn = openDb ()
++        let store = newStore conn None
++        let list = addList store u1 "Groceries"
++        for i in 1..210 do
++            addTodo store u1 list.Id (sprintf "Todo %d" i) None |> ignore
++        let p = okOf (pageTodos store u1 list.Id None (Some 200))
++        Assert.Equal(200, p.Rows.Length)
++        Assert.True p.Next.IsSome
++
 +    let private limitError (size: int) =
 +        use conn = openDb ()
 +        let store = newStore conn None
@@ -1376,8 +1390,10 @@ index 0000000..fa437ec
 +    let private todoAt (store: Store) (target: int64) : Record =
 +        let list = addList store u1 "Groceries"
 +        let mutable t = addTodo store u1 list.Id "Original" None
-+        while t.Version < target do
-+            t <- okOf (revise store (scopeOf u1 "Todo") todoModel t.Id (Some t.Version) t)
++        for _ in 1L .. target - 1L do
++            let next = okOf (revise store (scopeOf u1 "Todo") todoModel t.Id (Some t.Version) t)
++            Assert.Equal(t.Version + 1L, next.Version)
++            t <- next
 +        t
 +
 +    [<Fact>]
@@ -1915,6 +1931,17 @@ module ``CAP-persist-R5`` =
         Assert.Equal(25, p.Rows.Length)
         Assert.Equal(1, queryCount store - before)
 
+    [<Fact>]
+    let ``CAP-persist.R5 a page of 200 holds 200 of 210 todos`` () =
+        use conn = openDb ()
+        let store = newStore conn None
+        let list = addList store u1 "Groceries"
+        for i in 1..210 do
+            addTodo store u1 list.Id (sprintf "Todo %d" i) None |> ignore
+        let p = okOf (pageTodos store u1 list.Id None (Some 200))
+        Assert.Equal(200, p.Rows.Length)
+        Assert.True p.Next.IsSome
+
     let private limitError (size: int) =
         use conn = openDb ()
         let store = newStore conn None
@@ -2029,8 +2056,10 @@ module ``CAP-persist-R7`` =
     let private todoAt (store: Store) (target: int64) : Record =
         let list = addList store u1 "Groceries"
         let mutable t = addTodo store u1 list.Id "Original" None
-        while t.Version < target do
-            t <- okOf (revise store (scopeOf u1 "Todo") todoModel t.Id (Some t.Version) t)
+        for _ in 1L .. target - 1L do
+            let next = okOf (revise store (scopeOf u1 "Todo") todoModel t.Id (Some t.Version) t)
+            Assert.Equal(t.Version + 1L, next.Version)
+            t <- next
         t
 
     [<Fact>]
