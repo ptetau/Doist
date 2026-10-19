@@ -1,6 +1,6 @@
 # CH-0001 · Models
 
-Intent: IN-0001 · Scope: CAP-models · Status: planned · Ticket: none · Branch: none · Base: main
+Intent: IN-0001 · Scope: CAP-models · Status: testing · Ticket: none · Branch: pdlc/CH-0001-models · Base: ccr-1ef8bdfa-1cxxi7
 Tests-Locked: none
 
 ## Delivers
@@ -23,8 +23,6 @@ The engine can describe an F# record type as a model plan. The plan gives kinds,
   has the kind reference to `TodoList`.
 - Given the type defaults of the todo app. When the engine describes `Todo`, then `Done`
   has the kind boolean, and `CompletedAt` has the kind optional of timestamp.
-- Given a record type with no fields. When the engine describes it, then the plan has no
-  fields and no error. (assumed)
 - Given the union type `Priority` as a model. When the engine describes it, then the result
   is the error `WRONG_CONFIG_TYPE` with the message "Priority is not a record type."
   (assumed)
@@ -131,6 +129,33 @@ In `src/Typed.Engine/Overrides.fs`, module `Typed.Engine.Overrides`:
 - `overrides<'T>: Override<'T> list -> ModelOverrides`
 - `referencedFields: Expr -> string list`, `fieldsOf: OverrideItem -> string list`
 - `titleFieldName: Field list -> OverrideItem list -> string option`
+
+Types for the checks. The acceptance lines name the todo app. That app is a later change, so
+the checks declare these types themselves, exactly as written here, in the check file:
+
+```fsharp
+[<TitleType>]
+type Title      = Title of string
+type Notes      = Notes of string
+type Priority   = Low | Normal | High
+type TimeZoneId = TimeZoneId of string
+type ExternalId = ExternalId of string
+
+type User     = { Subject: ExternalId; DisplayName: Title; TimeZone: TimeZoneId }
+type TodoList = { Name: Title; Archived: bool }
+type Todo     = { List: Ref<TodoList>; Title: Title; Notes: Notes option; Priority: Priority
+                  Due: DateOnly option; Done: bool; CompletedAt: DateTimeOffset option }
+```
+
+The type defaults of the todo app are these four entries, and no others. `Priority` and
+`Ref<TodoList>` get their kinds from the engine, not from the list.
+
+| Clr | Kind | Check | Hidden | Unique |
+|---|---|---|---|---|
+| `Title` | `Text 200` | no line break | false | false |
+| `Notes` | `Text 5000` | none | false | false |
+| `TimeZoneId` | `Text 64` | known IANA zone | false | false |
+| `ExternalId` | `Text 255` | none | true | true |
 
 The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement, named with the requirement ID in double backticks, such as ``module ``CAP-models.R1`` ``. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
 

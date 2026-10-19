@@ -1,6 +1,6 @@
 # IN-0001 · Engine core: generator, checks, validate, persist
 
-Status: ready · Ticket: none · Branch: none · Added: 2026-10-19
+Status: building · Ticket: none · Branch: none · Added: 2026-10-19
 
 ## What and why
 
@@ -149,6 +149,12 @@ The changes, in stack order. Each change covers one spec.
 - Change stage: a check proves JOB-generate.R1 (findings and exit code) and R2 (schema
   file) with a changed `Config` through `Generator.run`. No check edits the app code
   (assumed).
+- Tests stage of CH-0001 (models): CAP-models.R1 (kinds from types) was "an empty record
+  gives a plan with no fields" (assumed). Now that line is removed, because F# cannot
+  declare a record with no fields. The test writer found this.
+- Branch model: the user chose pdlc branches off `ccr-1ef8bdfa-1cxxi7`. Each change
+  branch is `pdlc/CH-xxxx-<name>`, its base is the branch before it, and its pull
+  request targets that base. The first base is the ccr branch.
 
 ## Handoff
 

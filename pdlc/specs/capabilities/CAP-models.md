@@ -36,8 +36,6 @@ default in a list of type defaults. A plain union with no fields is an enum.
   has the kind reference to `TodoList`.
 - Given the type defaults of the todo app. When the engine describes `Todo`, then `Done`
   has the kind boolean, and `CompletedAt` has the kind optional of timestamp.
-- Given a record type with no fields. When the engine describes it, then the plan has no
-  fields and no error. (assumed)
 - Given the union type `Priority` as a model. When the engine describes it, then the result
   is the error `WRONG_CONFIG_TYPE` with the message "Priority is not a record type."
   (assumed)
