@@ -403,6 +403,17 @@ module ``CAP-persist-R5`` =
         Assert.Equal(25, p.Rows.Length)
         Assert.Equal(1, queryCount store - before)
 
+    [<Fact>]
+    let ``CAP-persist.R5 a page of 200 holds 200 of 210 todos`` () =
+        use conn = openDb ()
+        let store = newStore conn None
+        let list = addList store u1 "Groceries"
+        for i in 1..210 do
+            addTodo store u1 list.Id (sprintf "Todo %d" i) None |> ignore
+        let p = okOf (pageTodos store u1 list.Id None (Some 200))
+        Assert.Equal(200, p.Rows.Length)
+        Assert.True p.Next.IsSome
+
     let private limitError (size: int) =
         use conn = openDb ()
         let store = newStore conn None
@@ -517,8 +528,10 @@ module ``CAP-persist-R7`` =
     let private todoAt (store: Store) (target: int64) : Record =
         let list = addList store u1 "Groceries"
         let mutable t = addTodo store u1 list.Id "Original" None
-        while t.Version < target do
-            t <- okOf (revise store (scopeOf u1 "Todo") todoModel t.Id (Some t.Version) t)
+        for _ in 1L .. target - 1L do
+            let next = okOf (revise store (scopeOf u1 "Todo") todoModel t.Id (Some t.Version) t)
+            Assert.Equal(t.Version + 1L, next.Version)
+            t <- next
         t
 
     [<Fact>]
