@@ -1,6 +1,6 @@
 # CH-0006 · Todo app
 
-Intent: IN-0001 · Scope: CAP-todo-app · Status: building · Ticket: none · Branch: pdlc/CH-0006-todo-app · Base: pdlc/CH-0005-checks
+Intent: IN-0001 · Scope: CAP-todo-app · Status: built · Ticket: none · Branch: pdlc/CH-0006-todo-app · Base: pdlc/CH-0005-checks
 Tests-Locked: 3e52d322a80fce1c8d63131adbf5daa3d79f81c2
 
 ## Delivers
@@ -150,3 +150,4 @@ none
 
 - Planned by the change stage of IN-0001 (engine core). The requirements are copied from `CAP-todo-app` as the ready stage left them.
 - Sent back to tests: two R3 checks compare OverrideItem values that hold a quotation or function, so equality is by reference.
+- Built: 206 checks pass (22 new). Tests were re-locked three times for weak checks.
