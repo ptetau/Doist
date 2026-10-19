@@ -62,7 +62,7 @@ Look for these traps:
 # CH-0004 · Persist
 
 Intent: IN-0001 · Scope: CAP-persist · Status: testing · Ticket: none · Branch: pdlc/CH-0004-persist · Base: pdlc/CH-0003-validate
-Tests-Locked: 81284e2
+Tests-Locked: bbd2344
 
 ## Delivers
 
@@ -229,6 +229,7 @@ Migrations:
 - `writeShape: path: string -> Shape -> unit`
 - `type Rename = { Model: string; From: string; To: string }`: the `renamedFrom` note. (assumed)
 - `migration: previous: Shape option -> next: Shape -> Rename list -> Result<string, Finding>` · errors: `UNPLANNED_DROP`, `UNSAFE_MIGRATION`
+- Where the shape is stored: `migration` is pure. The caller that gets `Ok` from it writes `next` with `writeShape path next`, and the next run reads it back with `readShape path`. That pair is the store step of CAP-persist.R8 (migration drop). The generator job is that caller. (assumed)
 
 The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement. Name it with the requirement ID, with a hyphen in place of the dot, in double backticks: ``module ``CAP-models-R1`` ``. F# does not allow a dot in a module name. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
 
@@ -313,6 +314,10 @@ none
 - 2026-10-19T06:35:42+00:00 · Tests round 1: the review failed on a helper that could loop forever, and on a
   page-of-200 line with no proof. The test writer bounded the loop and added a 210-row
   check. Still red: `Typed.Engine.Persist` does not exist. Locked again at 81284e2.
+- 2026-10-19T06:38:04+00:00 · Tests round 2: the review failed on a system-column check that read the whole
+  schema, and on the store step of CAP-persist.R8 (migration drop) with no proof. The
+  Interface now names `writeShape` as that step. The test writer fixed both. Locked again
+  at bbd2344.
 ````
 
 ## The spec it covers: title and summary
@@ -856,10 +861,10 @@ naming must be simple and the same everywhere.
 ````
 diff --git a/tests/Typed.Engine.Tests/CAP-persist.Tests.fs b/tests/Typed.Engine.Tests/CAP-persist.Tests.fs
 new file mode 100644
-index 0000000..b5eb7c8
+index 0000000..33393d5
 --- /dev/null
 +++ b/tests/Typed.Engine.Tests/CAP-persist.Tests.fs
-@@ -0,0 +1,645 @@
+@@ -0,0 +1,656 @@
 +namespace Typed.Engine.Tests
 +
 +open System
@@ -1048,12 +1053,14 @@ index 0000000..b5eb7c8
 +
 +    [<Fact>]
 +    let ``CAP-persist.R1 Todo gets a table with the five system columns`` () =
-+        Assert.Contains("CREATE TABLE [Todo]", sqlServerSchema)
-+        Assert.Contains("[Id] uniqueidentifier NOT NULL PRIMARY KEY", sqlServerSchema)
-+        Assert.Contains("[Owner] uniqueidentifier NOT NULL", sqlServerSchema)
-+        Assert.Contains("[Version] rowversion NOT NULL", sqlServerSchema)
-+        Assert.Contains("[CreatedAt] datetimeoffset NOT NULL", sqlServerSchema)
-+        Assert.Contains("[UpdatedAt] datetimeoffset NOT NULL", sqlServerSchema)
++        // The text of the Todo table alone, so the columns of the other tables cannot satisfy the asserts.
++        let sql = createTable SqlServer todoModel todoItems todoAccess
++        Assert.Contains("CREATE TABLE [Todo]", sql)
++        Assert.Contains("[Id] uniqueidentifier NOT NULL PRIMARY KEY", sql)
++        Assert.Contains("[Owner] uniqueidentifier NOT NULL", sql)
++        Assert.Contains("[Version] rowversion NOT NULL", sql)
++        Assert.Contains("[CreatedAt] datetimeoffset NOT NULL", sql)
++        Assert.Contains("[UpdatedAt] datetimeoffset NOT NULL", sql)
 +
 +    [<Fact>]
 +    let ``CAP-persist.R1 User with the rule self has no Owner column`` () =
@@ -1472,8 +1479,17 @@ index 0000000..b5eb7c8
 +    [<Fact>]
 +    let ``CAP-persist.R8 no stored shape gives the full schema`` () =
 +        let models = [ (todoModel, [], todoAccess) ]
-+        let sql = migrationSql None (shapeOf models) []
++        let next = shapeOf models
++        let sql = migrationSql None next []
 +        Assert.Equal(schema SqlServer models, sql)
++        // The caller that gets Ok stores the new shape; the next run reads it back.
++        let dir = tempDir ()
++        try
++            let path = Path.Combine(dir, "shape.json")
++            writeShape path next
++            Assert.Equal(Some next, okOf (readShape path))
++        finally
++            Directory.Delete(dir, true)
 +
 +    [<Fact>]
 +    let ``CAP-persist.R8 a written shape reads back the same`` () =
@@ -1714,12 +1730,14 @@ module ``CAP-persist-R1`` =
 
     [<Fact>]
     let ``CAP-persist.R1 Todo gets a table with the five system columns`` () =
-        Assert.Contains("CREATE TABLE [Todo]", sqlServerSchema)
-        Assert.Contains("[Id] uniqueidentifier NOT NULL PRIMARY KEY", sqlServerSchema)
-        Assert.Contains("[Owner] uniqueidentifier NOT NULL", sqlServerSchema)
-        Assert.Contains("[Version] rowversion NOT NULL", sqlServerSchema)
-        Assert.Contains("[CreatedAt] datetimeoffset NOT NULL", sqlServerSchema)
-        Assert.Contains("[UpdatedAt] datetimeoffset NOT NULL", sqlServerSchema)
+        // The text of the Todo table alone, so the columns of the other tables cannot satisfy the asserts.
+        let sql = createTable SqlServer todoModel todoItems todoAccess
+        Assert.Contains("CREATE TABLE [Todo]", sql)
+        Assert.Contains("[Id] uniqueidentifier NOT NULL PRIMARY KEY", sql)
+        Assert.Contains("[Owner] uniqueidentifier NOT NULL", sql)
+        Assert.Contains("[Version] rowversion NOT NULL", sql)
+        Assert.Contains("[CreatedAt] datetimeoffset NOT NULL", sql)
+        Assert.Contains("[UpdatedAt] datetimeoffset NOT NULL", sql)
 
     [<Fact>]
     let ``CAP-persist.R1 User with the rule self has no Owner column`` () =
@@ -2138,8 +2156,17 @@ module ``CAP-persist-R8`` =
     [<Fact>]
     let ``CAP-persist.R8 no stored shape gives the full schema`` () =
         let models = [ (todoModel, [], todoAccess) ]
-        let sql = migrationSql None (shapeOf models) []
+        let next = shapeOf models
+        let sql = migrationSql None next []
         Assert.Equal(schema SqlServer models, sql)
+        // The caller that gets Ok stores the new shape; the next run reads it back.
+        let dir = tempDir ()
+        try
+            let path = Path.Combine(dir, "shape.json")
+            writeShape path next
+            Assert.Equal(Some next, okOf (readShape path))
+        finally
+            Directory.Delete(dir, true)
 
     [<Fact>]
     let ``CAP-persist.R8 a written shape reads back the same`` () =

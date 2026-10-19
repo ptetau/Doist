@@ -151,7 +151,15 @@ Schema and queries (pure):
 The store (runs SQL):
 
 - `type Store`: made by `Store.create (conn: System.Data.Common.DbConnection) (dialect: Dialect) (now: unit -> DateTimeOffset) (onBeforeChildDelete: (int -> unit) option)`. The four arguments are curried. Pass `None` for no hook.
-- `Record.Values` holds each field in its stored form: text and a semantic text type as `string`, an enum as its case name `string`, a reference as `Guid`, a boolean as `bool`, a date as `DateOnly`, a timestamp as `DateTimeOffset`, a whole number as `int64`, and a decimal as `decimal`. An empty optional field has no key. (assumed)
+- `Record.Values` holds each field in its stored form (assumed). An empty optional field has no key. The forms are these:
+  - text, and a semantic text type: `string`
+  - an enum: its case name, as `string`
+  - a reference: `Guid`
+  - a boolean: `bool`
+  - a date: `DateOnly`
+  - a timestamp: `DateTimeOffset`
+  - a whole number: `int64`
+  - a decimal: `decimal`
 - `Shape` and `Rename` are F# records, so two equal shapes compare equal. `migration None next renames` gives exactly `schema SqlServer` for the models of `next`. The migration always writes SQL Server. (assumed)
 - `type Page = { Rows: Record list; Next: string option }`
 - `find: Store -> Scope -> Model -> Guid -> Result<Record, Finding>` · errors: `NOT_FOUND`
@@ -254,6 +262,7 @@ none
   page-of-200 line with no proof. The test writer bounded the loop and added a 210-row
   check. Still red: `Typed.Engine.Persist` does not exist. Locked again at 81284e2.
 - 2026-10-19T06:38:04+00:00 · Tests round 2: the review failed on a system-column check that read the whole
-  schema, and on the store step of CAP-persist.R8 (migration drop) with no proof. The
+  schema. It also failed on the store step of CAP-persist.R8 (migration drop), which had no
+  proof. The
   Interface now names `writeShape` as that step. The test writer fixed both. Locked again
   at bbd2344.

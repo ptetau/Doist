@@ -1,67 +1,60 @@
-Result: fail
+Result: pass
 
 Remit: tests
 
-Problems:
-- tests/Typed.Engine.Tests/CAP-persist.Tests.fs:1716-1722 · The check "Todo gets a table with the five system columns" looks for `[Id] ... PRIMARY KEY`, `[Version]`, `[CreatedAt]` and `[UpdatedAt]` in the whole three-table schema (`sqlServerSchema`), not in the `[Todo]` table. A Todo table that lacks one of these columns still passes, because `[TodoList]` and `[User]` have the same columns. Only `[Owner]` is checked on the Todo table alone, by a separate check. · CAP-persist.R1 line 1 (the `Todo` table holds these columns); remit: the check can fail on a plausible wrong version.
-- tests/Typed.Engine.Tests/CAP-persist.Tests.fs:2138-2142 · The check "no stored shape gives the full schema" proves the first half of the line only (the migration equals the full schema). Nothing proves "the engine stores the new shape". The only related check is the `writeShape`/`readShape` round trip, which does not involve `migration`. · CAP-persist.R8 line 5 (assumed). The Interface names no surface for this store step, so the spec also needs to say where it happens.
+Problems: none
 
 Wrong versions:
-- R1 five system columns · Todo table drops `[UpdatedAt]` (other tables keep it) · passes
-- R1 User has no Owner · User table keeps `[Owner]` · fails (`DoesNotContain "[Owner]"` on the User table)
-- R1 Todo keeps Owner · Owner dropped from owned tables · fails
-- R1 SQL types · `[Notes]` as `nvarchar(200)` · fails
-- R1 HasDue persisted · the column is not added · fails
-- R1 no listSort, no HasDue · HasDue always added · fails
-- R1 column override · override ignored, `[Subject]` kept · fails
-- R1 sensitive override · sensitive drops the column · fails (schemas differ)
-- R2 FK_Todo_List · the FK is missing or named differently · fails
-- R2 foreignKeys once · the key is listed twice · fails
-- R2 no CASCADE · the FK adds `ON DELETE CASCADE` · fails
-- R2 one index starts with List · no FK index, or two · fails
-- R3 TodoList index · the two views each get an index, or Name is left out · fails
-- R3 Todo index · `HasDue` left out of the index · fails
-- R3 User unique index · the index is not unique · fails
-- R3 Note index · no title index · fails
-- R4 columns · `SELECT *` · fails
-- R4 owner and parent filter · the `[Owner]` filter is left out · fails
-- R4 ORDER BY · `[HasDue] ASC` · fails
-- R4 Archived view · the view filter is not applied · fails
-- R4 Active view · the filter is inverted, or `= 1` is always added · fails
-- R4 TodoList columns and Todo without listColumns · the wide `[Notes]` is selected · fails
-- R5 paging 25 · the cursor has no `Id` tie-break, so same-date rows repeat or are skipped · fails (19 rows over 3 dates, pages of 4)
-- R5 paging 25 · the parent filter is dropped · fails (decoy in another list of u1)
-- R5 paging 25 · the owner filter is dropped · passes (the u2 decoy is in a different list, so the parent filter hides it)
-- R5 sort order · empty dates sort first · fails
-- R5 size 1 and size 200 one query · an extra count query · fails
-- R5 210 rows · the cap is 100 · fails
-- R5 theory 0, 201, 300, -1 · the limit is `<= 250` · fails (201). Cases 1 and 200 are accepted, so both edges are covered.
-- R5 default 50 · the default is 100 or 20 · fails (55 rows)
-- R5 bad cursor · the cursor is accepted · fails
-- R6 removes list and 3 todos · the children are left · fails
-- R6 other list kept · all todos are deleted · fails
-- R6 failure after the second · no transaction, or no rollback · fails
-- R6 u1 removes u2's list · the children are deleted before the owner check · fails (u2 todos are checked)
-- R7 version 3 to 4 · the version does not rise · fails
-- R7 stale · no version check · fails
-- R7 new todo at 1 · new todo starts at 0 · fails
-- R7 no version · a missing version is accepted · fails
-- R8 UNPLANNED_DROP · a silent drop · fails
-- R8 sp_rename · the rename note is ignored · fails
-- R8 optional column · wrong ADD text · fails
-- R8 UNSAFE_MIGRATION · a required column without a default is allowed · fails
-- R8 no stored shape · a partial schema is returned · fails
-- R8 round trip · the shape loses data · fails
-- R8 no file · missing file gives an error · fails
-- R8 SHAPE_UNREADABLE · invalid JSON throws or gives `None` · fails
+- CAP-persist.R1 system columns · Todo table lacks `[Version] rowversion` or has `[Version] int` · fails (exact string asserts on the Todo table alone)
+- CAP-persist.R1 User has no Owner · code adds Owner to every table · fails
+- CAP-persist.R1 Owned keeps Owner · code drops Owner everywhere · fails
+- CAP-persist.R1 SQL types · Notes written as `nvarchar(200)`, or Priority as `nvarchar(16)` · fails
+- CAP-persist.R1 HasDue · column missing or not PERSISTED · fails
+- CAP-persist.R1 no listSort, no HasDue · code always adds HasDue · fails
+- CAP-persist.R1 column override · override ignored, `[Subject]` kept · fails
+- CAP-persist.R1 sensitive · sensitive drops the column from the schema · fails (schema equality)
+- CAP-persist.R2 FK · FK text differs, or no FK written · fails
+- CAP-persist.R2 foreignKeys once · two keys for one reference · fails
+- CAP-persist.R2 no CASCADE · FK written with ON DELETE CASCADE · fails
+- CAP-persist.R2 index on List · no index starts with List, or two do · fails
+- CAP-persist.R3 TodoList · one index per view, or `Owner, Name, Id` · fails (exact column list, count of 1)
+- CAP-persist.R3 Todo · `HasDue` left out of the index, or a duplicate index · fails
+- CAP-persist.R3 User · non-unique index, or an added list index · fails
+- CAP-persist.R3 Note · no title-field index · fails
+- CAP-persist.R4 columns · `SELECT *`, or the Notes column added · fails
+- CAP-persist.R4 owner and parent · parent filter missing · fails
+- CAP-persist.R4 order · `ORDER BY [Due] ASC, [Id] ASC` with no HasDue · fails (EndsWith)
+- CAP-persist.R4 Archived view · view filter ignored · fails; Active view with `= 1` · fails
+- CAP-persist.R4 TodoList columns · extra column in the list · fails
+- CAP-persist.R5 paging 4 at a time · keyset on Due only, with no Id tie-break · fails (3 dates and 6 rows per date cross page edges)
+- CAP-persist.R5 order · empty dates sort first (SQLite NULLs first) · fails (the order assert and the 6 empty at the end)
+- CAP-persist.R5 size 1 and size 200 one query · an extra COUNT query for Next · fails
+- CAP-persist.R5 200 of 210 · cap of 100 · fails; the cap off by one, 199 · fails
+- CAP-persist.R5 size outside 1 to 200 · bound of `<= 200` changed to `< 200`, or `>= 0` · fails (accepts 1 and 200; rejects 0 and 201)
+- CAP-persist.R5 default 50 · default 100 · fails (55 rows)
+- CAP-persist.R5 bad cursor · cursor ignored, or a crash · fails
+- CAP-persist.R6 removal · children left behind · fails
+- CAP-persist.R6 keeps other list · delete of all todos · fails
+- CAP-persist.R6 failure · no transaction, so todos 1 and 2 are gone · fails
+- CAP-persist.R6 u2 list · no owner check, or children deleted before the check · fails
+- CAP-persist.R7 save passes · version not bumped, or set to a constant · fails (the step loop asserts +1)
+- CAP-persist.R7 stale · version not compared, or the write happens before the compare · fails
+- CAP-persist.R7 new at version 1 · add sets version 0 · fails
+- CAP-persist.R7 no version · treated as a save with no check · fails
+- CAP-persist.R8 UNPLANNED_DROP · the column dropped silently · fails
+- CAP-persist.R8 sp_rename · ADD plus DROP COLUMN instead · fails
+- CAP-persist.R8 optional column · wrong type, or NOT NULL · fails
+- CAP-persist.R8 required column · ADD with a default, no error · fails
+- CAP-persist.R8 no stored shape · migration is empty, or the shape does not round-trip · fails
+- CAP-persist.R8 round trip · lossy JSON · fails
+- CAP-persist.R8 no file · returns an error for a missing file · fails
+- CAP-persist.R8 not JSON · returns None or throws · fails
 
-Follow-ups:
-- R5: the owner filter on a page is proved only at the string level (R4). Add a store-level line where u1 asks for a list that u2 owns, and expect no rows or `NOT_FOUND`.
-- R7: no line covers a save with a version newer than the stored one. Add that line to pin the rule "any version other than the stored one is stale".
+Follow-ups: none
 
 Notes:
-- Names follow the tagging rule. Each module is named with its requirement ID (for example ``CAP-persist-R1``). Each check name starts with `CAP-persist.Rn`.
-- Every Interface error code has a check with the exact code: `NOT_FOUND`, `STALE_VERSION`, `VALIDATION_FAILED` (limit, cursor, Version), `UNPLANNED_DROP`, `UNSAFE_MIGRATION`, `SHAPE_UNREADABLE`.
-- The clock is set through `Store.create ... now`. No acceptance line depends on the date.
-- The paging helper stops after 30 pages, so no check can hang.
-- Checks use the `Sqlite` dialect for store runs and `SqlServer` for quoted SQL. This matches the Interface.
+- The R5 paging decoys sit in another list, so removing the owner filter alone would pass R5. The R4 text check on `[Owner] = @owner` catches the missing filter in the query text. A decoy in the same list owned by u2 would close this gap.
+- No line depends on the current date or time, so no clock check is needed.
+- The R5 limit check is a `[<Theory>]`, not a `[<Fact>]`. It still runs and has the ID in its name.
+- Every Interface error code has an exact-code check. The NOT_FOUND code is proved by `remove` and by `isGone` on `find`.
+- The loop in `collectAll` stops after 30 pages, so no check can hang.
