@@ -1,7 +1,7 @@
 # CH-0006 · Todo app
 
 Intent: IN-0001 · Scope: CAP-todo-app · Status: testing · Ticket: none · Branch: pdlc/CH-0006-todo-app · Base: pdlc/CH-0005-checks
-Tests-Locked: none
+Tests-Locked: 9c3951347ac1bdee08445c497dbd1013a9aed668
 
 ## Delivers
 
