@@ -1,7 +1,7 @@
 # CH-0004 · Persist
 
 Intent: IN-0001 · Scope: CAP-persist · Status: testing · Ticket: none · Branch: pdlc/CH-0004-persist · Base: pdlc/CH-0003-validate
-Tests-Locked: 81284e2
+Tests-Locked: bbd2344
 
 ## Delivers
 
@@ -168,6 +168,7 @@ Migrations:
 - `writeShape: path: string -> Shape -> unit`
 - `type Rename = { Model: string; From: string; To: string }`: the `renamedFrom` note. (assumed)
 - `migration: previous: Shape option -> next: Shape -> Rename list -> Result<string, Finding>` · errors: `UNPLANNED_DROP`, `UNSAFE_MIGRATION`
+- Where the shape is stored: `migration` is pure. The caller that gets `Ok` from it writes `next` with `writeShape path next`, and the next run reads it back with `readShape path`. That pair is the store step of CAP-persist.R8 (migration drop). The generator job is that caller. (assumed)
 
 The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement. Name it with the requirement ID, with a hyphen in place of the dot, in double backticks: ``module ``CAP-models-R1`` ``. F# does not allow a dot in a module name. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
 
@@ -252,3 +253,7 @@ none
 - 2026-10-19T06:35:42+00:00 · Tests round 1: the review failed on a helper that could loop forever, and on a
   page-of-200 line with no proof. The test writer bounded the loop and added a 210-row
   check. Still red: `Typed.Engine.Persist` does not exist. Locked again at 81284e2.
+- 2026-10-19T06:38:04+00:00 · Tests round 2: the review failed on a system-column check that read the whole
+  schema, and on the store step of CAP-persist.R8 (migration drop) with no proof. The
+  Interface now names `writeShape` as that step. The test writer fixed both. Locked again
+  at bbd2344.
