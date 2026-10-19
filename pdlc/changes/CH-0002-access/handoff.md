@@ -1,20 +1,18 @@
-# Handoff · CH-0002 · build → show
+# Handoff · CH-0002 · show → verify
 
-Time: 2026-10-19T06:03:30+00:00
+Time: 2026-10-19T06:05:54+00:00
 
 ## Done
 
-The builder wrote `src/Typed.Engine/Access.fs` and added it to the project. All 54 checks
-pass, 24 of them for CAP-access.R1 (four rules) to R5 (owner from parent). The check
-files did not change after the lock `da2df15`. The build commit is `25a51a9`. The five
-requirements are `built`.
+Recorded `review.gif` with 20 frames in a terminal. Frame 1 builds the library. Frames 2
+to 19 each run `show.fsx` for one acceptance line of CAP-access.R1 (four rules) to R5
+(owner from parent), and print the access, the scope kind, the error code, or the reason.
+Frame 20 runs the 24 checks of CAP-access and shows "Passed! 24". The GIF shows 18 of 18
+acceptance lines.
 
 ## Decided on defaults
 
-- `Scope` is a record with private fields, so only the `Access` module builds one
-  (assumed by the builder)
-- `checkChange` applies the read-only rule to every action on a child, so a delete of a
-  todo in an archived list is refused too (assumed by the builder)
+- none in this stage
 
 ## Open
 
@@ -22,14 +20,14 @@ requirements are `built`.
 
 ## Look here
 
-- src/Typed.Engine/Access.fs (what to show)
-- tests/Typed.Engine.Tests/CAP-access.Tests.fs (the 24 checks)
+- pdlc/changes/CH-0002-access/review.gif and frames/
+- pdlc/changes/CH-0002-access/visual.json and show.fsx
 
 ## Don't redo
 
-- The checks and the build. Both are committed and pass.
+- The recording. Each frame was read. No frame shows an error that the spec did not ask
+  for.
 
 ## Next: do this first
 
-This change is a library with no screen. Record the terminal with one `dotnet fsi` call
-for each acceptance line, as CH-0001 (models) did, then the CAP-access checks.
+Run the checks, then send one packet for each remit to a fresh reviewer.

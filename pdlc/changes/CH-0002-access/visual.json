@@ -1,0 +1,86 @@
+{
+  "kind": "terminal",
+  "title": "CH-0002 \u00b7 Access",
+  "steps": [
+    {
+      "caption": "CH-0002 \u00b7 Build the engine library",
+      "run": "dotnet build src/Typed.Engine/Typed.Engine.fsproj --nologo -v q"
+    },
+    {
+      "caption": "CAP-access.R1 \u00b7 rule<TodoList> owned gives model TodoList, access Owned",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R1.1"
+    },
+    {
+      "caption": "CAP-access.R1 \u00b7 rule<Todo> ownedVia List gives reference List, parent TodoList",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R1.2"
+    },
+    {
+      "caption": "CAP-access.R1 \u00b7 rule<User> self gives Self",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R1.3"
+    },
+    {
+      "caption": "CAP-access.R1 \u00b7 rule<Audit> system gives SystemOnly",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R1.4"
+    },
+    {
+      "caption": "CAP-access.R2 \u00b7 readOnlyWhenParent names TodoList and Archived",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R2.1"
+    },
+    {
+      "caption": "CAP-access.R2 \u00b7 readOnlyWhenParent on owned fails with its message",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R2.2"
+    },
+    {
+      "caption": "CAP-access.R3 \u00b7 The scope for TodoList is the owner filter for u1",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R3.1"
+    },
+    {
+      "caption": "CAP-access.R3 \u00b7 The scope for User (self) is the self scope for u1",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R3.2"
+    },
+    {
+      "caption": "CAP-access.R3 \u00b7 The scope for Todo (ownedVia) is the owner filter for u1",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R3.3"
+    },
+    {
+      "caption": "CAP-access.R3 \u00b7 A user scope for Audit (system) is NOT_FOUND",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R3.4"
+    },
+    {
+      "caption": "CAP-access.R3 \u00b7 The build scope is the engine-only scope",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R3.5"
+    },
+    {
+      "caption": "CAP-access.R4 \u00b7 A change in the archived list Old is READ_ONLY_RECORD",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R4.1"
+    },
+    {
+      "caption": "CAP-access.R4 \u00b7 A change in the list Groceries passes",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R4.2"
+    },
+    {
+      "caption": "CAP-access.R4 \u00b7 A delete of the archived list itself passes",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R4.3"
+    },
+    {
+      "caption": "CAP-access.R4 \u00b7 A change to a todo whose list does not exist is NOT_FOUND",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R4.4"
+    },
+    {
+      "caption": "CAP-access.R4 \u00b7 Creating a todo in the archived list Old is READ_ONLY_RECORD",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R4.5"
+    },
+    {
+      "caption": "CAP-access.R5 \u00b7 A todo in a list owned by u1 gets the owner u1",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R5.1"
+    },
+    {
+      "caption": "CAP-access.R5 \u00b7 A todo in a list owned by u2 is NOT_FOUND for u1",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0002-access/show.fsx R5.2"
+    },
+    {
+      "caption": "CH-0002 \u00b7 All 24 checks of CAP-access pass",
+      "run": "dotnet test tests/Typed.Engine.Tests --filter DisplayName~CAP-access --nologo -v q"
+    }
+  ]
+}
