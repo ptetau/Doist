@@ -289,6 +289,9 @@ none
 - 2026-10-19T06:46:50+00:00 · Build: the builder wrote `Persist.fs`. All 139 checks pass. The check files did
   not change after the lock. Commit `066a033`. The builder named six points where the
   Interface was silent. They are in the handoff for the verify reviewers.
+- 2026-10-19T06:56:21+00:00 · Verify round 1 failed on the caption of frame 40 (49 checks, 51 runs). Sent back
+  to show. Filed IN-0011 (store fails closed), IN-0012 (listQuery finding), IN-0013
+  (cursor privacy), and IN-0014 (persist tidy).
 ````
 
 ## The spec it covers: title and summary

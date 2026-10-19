@@ -5,14 +5,16 @@ Remit: security
 Problems: none
 
 Follow-ups:
-- `page` and `listQuery` add no owner filter for the access rule `SystemOnly`. Only the scope from CAP-access guards that case, and it never makes a user scope for such a model. A guard in `page` could return `NOT_FOUND` when the access is `SystemOnly` and the scope is not the engine scope. This adds defence in depth and fails closed.
-- `remove` returns `Ok` and commits when the final parent delete affects 0 rows. This can happen if another caller deletes the parent after the first `find`. A check of the row count, or a `find` inside the transaction, would close that window.
-- Identifiers go into SQL as `[name]` with no escape of `]`. Names come from model types and `column` overrides, which the developer writes. Escaping `]` or checking names would help if names ever come from outside input.
+- Escape or validate identifiers and literals that the engine puts into SQL text. `q` wraps a name in brackets without doubling `]`. `sp_rename` takes unquoted names. `migration` copies the `Computed` text and the type from the stored shape into SQL. The names come from developer models and `build/shape.json`, not from users, so no acceptance line is broken. A new intent could add the check.
+- Make `remove` check the row count of the parent delete. A parent that vanishes after `find` would still commit the child deletes. A new intent could roll back when the count is 0.
+- Make `page` refuse a `SystemOnly` model for a user scope. Today the query has no owner filter for that rule. CAP-access.R3 stops a user scope from existing for such a model, so this is defence in depth.
+- Cap the cursor length before decode. A new intent could add the cap.
 
 Notes:
-- All values are bound as parameters: the owner, parent, cursor, limit, view literals, and record values. Only developer-authored names (model, field, and column names) enter SQL text.
-- The cursor is user input. A bad cursor gives `VALIDATION_FAILED`. A forged cursor cannot widen access, because the owner filter stays in every list query.
-- `page` with the engine scope gives `NOT_FOUND`. `find`, `revise`, and `remove` apply the scope filter. A missing or foreign record gives `NOT_FOUND`.
-- `remove` runs in one transaction and rolls back on a raised failure. The parent is checked through the scope before the children are deleted.
-- The code holds no secrets. Errors and messages hold only the model, field, and fixed text.
-- No new dependency is added. The fsproj only gains the `Compile` entry.
+- Every value from a caller (owner, parent, cursor parts, view literals, ids, versions) goes in as a bound parameter. The `limit` is checked as 1 to 200 before use.
+- An engine scope in `page` returns NOT_FOUND, so it fails closed. `find`, `revise`, and `remove` apply the scope filter to the read and to the write.
+- The child delete in `remove` skips the owner filter. It runs only after `find` proved the parent is in scope, and a child copies its owner from the parent.
+- Errors hold fixed text. They hold no secret, connection string, or file path.
+- A bad view name in `listQuery` raises an exception instead of a finding. This is already filed as IN-0012.
+- The cursor is not signed. IN-0013 (cursor privacy) already covers it.
+- The change adds no package reference. The `fsproj` change is the Compile entry only.

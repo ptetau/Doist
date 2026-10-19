@@ -5,11 +5,11 @@ Remit: privacy
 Problems: none
 
 Follow-ups:
-- A keyset cursor holds the last row's sort values, for example a title, in plain base64. A new intent could sign or encrypt the cursor, so a cursor never shows field values. The spec does not ask for it, and the values belong to the caller who gets the page.
+- The cursor holds the sort-field values of the last row as plain base64 JSON. A caller can read them. The values come from rows the caller already sees under the owner filter, so no other person's data leaks. A new intent could sign or encrypt the cursor. IN-0013 (cursor privacy) already covers this.
+- The engine stores every field of a model, including fields marked `sensitive`. The spec only requires that `sensitive` leaves the schema unchanged (R1). A new intent could add protection at rest for sensitive columns.
 
 Notes:
-- `Persist.fs` has no logging and no output call. Error messages hold model names, column names, and fixed text. None holds a record value.
-- Queries bind every value as a parameter. Every read and write takes the scope owner filter.
-- `build/shape.json` holds table and column names only, with no record data.
-- The `sensitive` override changes nothing in the schema, as CAP-persist.R1 says. The change stores no extra personal data and sets no retention rule. The spec asks for neither.
-- I read the diff and the first full copy of `Persist.fs` in the packet. The packet's later copy and the check files are not needed for this remit.
+- The change is mostly not applicable to privacy: `Persist.fs` is generic schema, query, and store code. It names no personal data itself. The todo app's `User` model (`Subject`, `DisplayName`) passes through it.
+- No logging or printing of data. Findings hold the model name, the field name, and fixed messages. The `viewToSql` error prints the view expression, not row data.
+- All queries bind values as parameters and filter by owner. A record outside the scope returns `NOT_FOUND`.
+- No data goes to any outside place. `shape.json` holds the schema only, with no row data.
