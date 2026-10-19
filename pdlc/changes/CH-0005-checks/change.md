@@ -1,6 +1,6 @@
 # CH-0005 · Checks
 
-Intent: IN-0001 · Scope: CAP-checks · Status: testing · Ticket: none · Branch: pdlc/CH-0005-checks · Base: pdlc/CH-0004-persist
+Intent: IN-0001 · Scope: CAP-checks · Status: building · Ticket: none · Branch: pdlc/CH-0005-checks · Base: pdlc/CH-0004-persist
 Tests-Locked: 09ce3bfba7806424b1e5c4c262c49dde5bc47552
 
 ## Delivers
@@ -128,7 +128,7 @@ In `src/Typed.Engine/Checks.fs`, module `Typed.Engine.Checks`:
 - `run: TypeDefault list -> Type list -> AccessRule list -> ModelOverrides list -> Finding list`: every finding, errors and warnings, in model order then field order.
 - `errors: Finding list -> Finding list` and `warnings: Finding list -> Finding list`: the two halves of a result.
 - Each finding gives its code in `Code`, as `DES-errors` names it, and its text in `Message`. The messages are the quoted texts in the acceptance lines.
-- Codes: `MISSING_DEFAULT`, `MISSING_ACCESS_RULE`, `MISSING_FIELD`, `WRONG_CONFIG_TYPE`, `SYSTEM_FIELD_TARGET`, `DANGLING_REFERENCE`, `NO_TITLE_FIELD`, `UNSAFE_ESCAPE_HATCH` (warning), `REDUNDANT_OVERRIDE` (warning)
+- Codes: `MISSING_ACCESS_RULE`, `MISSING_FIELD`, `WRONG_CONFIG_TYPE`, `SYSTEM_FIELD_TARGET`, `DANGLING_REFERENCE`, `NO_TITLE_FIELD`, `UNSAFE_ESCAPE_HATCH` (warning), `REDUNDANT_OVERRIDE` (warning)
 
 The checks are xUnit `[<Fact>]` functions in F#. Put one `module` for each requirement. Name it with the requirement ID, with a hyphen in place of the dot, in double backticks: ``module ``CAP-models-R1`` ``. F# does not allow a dot in a module name. Start each check name with the ID, as ``let ``CAP-models.R1 Title has kind text 200`` () = ...``. The checks project is `tests/Typed.Engine.Tests/Typed.Engine.Tests.fsproj` (xUnit, .NET 8). The first change makes that project. Later changes add their check file to its `Compile` list.
 
