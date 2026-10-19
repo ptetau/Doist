@@ -1,0 +1,166 @@
+{
+  "kind": "terminal",
+  "title": "CH-0004 \u00b7 Persist",
+  "steps": [
+    {
+      "caption": "CH-0004 \u00b7 Build the engine library",
+      "run": "dotnet build src/Typed.Engine/Typed.Engine.fsproj --nologo -v q"
+    },
+    {
+      "caption": "CAP-persist.R1 \u00b7 Todo table holds the five system columns",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R1.1"
+    },
+    {
+      "caption": "CAP-persist.R1 \u00b7 User with rule self has no Owner column",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R1.2"
+    },
+    {
+      "caption": "CAP-persist.R1 \u00b7 Todo fields get their SQL types",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R1.3"
+    },
+    {
+      "caption": "CAP-persist.R1 \u00b7 listSort on Due adds the persisted HasDue column",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R1.4"
+    },
+    {
+      "caption": "CAP-persist.R1 \u00b7 column override renames Subject to ExternalSubject",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R1.5"
+    },
+    {
+      "caption": "CAP-persist.R1 \u00b7 sensitive override leaves the schema unchanged",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R1.6"
+    },
+    {
+      "caption": "CAP-persist.R2 \u00b7 Todo gets the foreign key FK_Todo_List",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R2.1"
+    },
+    {
+      "caption": "CAP-persist.R2 \u00b7 The schema of the three models has no CASCADE",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R2.2"
+    },
+    {
+      "caption": "CAP-persist.R2 \u00b7 One Todo index starts with the column List",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R2.3"
+    },
+    {
+      "caption": "CAP-persist.R3 \u00b7 TodoList gets one index: Owner, Archived, Name, Id",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R3.1"
+    },
+    {
+      "caption": "CAP-persist.R3 \u00b7 Todo gets one index: Owner, List, HasDue, Due, Id",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R3.2"
+    },
+    {
+      "caption": "CAP-persist.R3 \u00b7 User gets a unique index on Subject, no list index",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R3.3"
+    },
+    {
+      "caption": "CAP-persist.R3 \u00b7 Owned model with a title and no sort: Owner, title, Id",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R3.4"
+    },
+    {
+      "caption": "CAP-persist.R4 \u00b7 Todo list query names its columns",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R4.1"
+    },
+    {
+      "caption": "CAP-persist.R4 \u00b7 Todo list query filters by Owner and List",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R4.2"
+    },
+    {
+      "caption": "CAP-persist.R4 \u00b7 Todo list query ends with ORDER BY HasDue, Due, Id",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R4.3"
+    },
+    {
+      "caption": "CAP-persist.R4 \u00b7 The Archived view adds [Archived] = 1",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R4.4"
+    },
+    {
+      "caption": "CAP-persist.R4 \u00b7 TodoList with no listColumns: Id, Name, Archived",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R4.5"
+    },
+    {
+      "caption": "CAP-persist.R5 \u00b7 Paging 4 at a time returns each of 25 todos once",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R5.1"
+    },
+    {
+      "caption": "CAP-persist.R5 \u00b7 Page size 1 and page size 200 each run one query",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R5.2"
+    },
+    {
+      "caption": "CAP-persist.R5 \u00b7 Page size 300: VALIDATION_FAILED on limit",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R5.3"
+    },
+    {
+      "caption": "CAP-persist.R5 \u00b7 Page size 0: VALIDATION_FAILED on limit",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R5.4"
+    },
+    {
+      "caption": "CAP-persist.R5 \u00b7 Page size 200 holds up to 200 rows",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R5.5"
+    },
+    {
+      "caption": "CAP-persist.R5 \u00b7 No page size gives a page of 50",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R5.6"
+    },
+    {
+      "caption": "CAP-persist.R5 \u00b7 Cursor \"not-a-cursor\": VALIDATION_FAILED on cursor",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R5.7"
+    },
+    {
+      "caption": "CAP-persist.R6 \u00b7 Removing a list removes the list and its 3 todos",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R6.1"
+    },
+    {
+      "caption": "CAP-persist.R6 \u00b7 A failure after the second todo leaves all rows",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R6.2"
+    },
+    {
+      "caption": "CAP-persist.R6 \u00b7 u1 removing a list of u2: NOT_FOUND, list stays",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R6.3"
+    },
+    {
+      "caption": "CAP-persist.R7 \u00b7 Save with version 3 on version 3 gives version 4",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R7.1"
+    },
+    {
+      "caption": "CAP-persist.R7 \u00b7 Save with version 3 on version 4: STALE_VERSION",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R7.2"
+    },
+    {
+      "caption": "CAP-persist.R7 \u00b7 A new todo is stored at version 1",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R7.3"
+    },
+    {
+      "caption": "CAP-persist.R7 \u00b7 Save with no version: VALIDATION_FAILED on Version",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R7.4"
+    },
+    {
+      "caption": "CAP-persist.R8 \u00b7 Due dropped with no renamedFrom: UNPLANNED_DROP",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R8.1"
+    },
+    {
+      "caption": "CAP-persist.R8 \u00b7 renamedFrom \"Due\" on DueDate gives sp_rename",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R8.2"
+    },
+    {
+      "caption": "CAP-persist.R8 \u00b7 One more optional column gives ALTER TABLE ADD",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R8.3"
+    },
+    {
+      "caption": "CAP-persist.R8 \u00b7 One more required column: UNSAFE_MIGRATION",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R8.4"
+    },
+    {
+      "caption": "CAP-persist.R8 \u00b7 No stored shape: full schema, and the shape is stored",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R8.5"
+    },
+    {
+      "caption": "CAP-persist.R8 \u00b7 A shape file that is not JSON: SHAPE_UNREADABLE",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0004-persist/show.fsx R8.6"
+    },
+    {
+      "caption": "CH-0004 \u00b7 All 49 checks of CAP-persist pass",
+      "run": "dotnet test tests/Typed.Engine.Tests --filter DisplayName~CAP-persist --nologo -v q"
+    }
+  ]
+}
