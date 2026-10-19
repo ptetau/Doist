@@ -186,12 +186,14 @@ module ``CAP-persist-R1`` =
 
     [<Fact>]
     let ``CAP-persist.R1 Todo gets a table with the five system columns`` () =
-        Assert.Contains("CREATE TABLE [Todo]", sqlServerSchema)
-        Assert.Contains("[Id] uniqueidentifier NOT NULL PRIMARY KEY", sqlServerSchema)
-        Assert.Contains("[Owner] uniqueidentifier NOT NULL", sqlServerSchema)
-        Assert.Contains("[Version] rowversion NOT NULL", sqlServerSchema)
-        Assert.Contains("[CreatedAt] datetimeoffset NOT NULL", sqlServerSchema)
-        Assert.Contains("[UpdatedAt] datetimeoffset NOT NULL", sqlServerSchema)
+        // The text of the Todo table alone, so the columns of the other tables cannot satisfy the asserts.
+        let sql = createTable SqlServer todoModel todoItems todoAccess
+        Assert.Contains("CREATE TABLE [Todo]", sql)
+        Assert.Contains("[Id] uniqueidentifier NOT NULL PRIMARY KEY", sql)
+        Assert.Contains("[Owner] uniqueidentifier NOT NULL", sql)
+        Assert.Contains("[Version] rowversion NOT NULL", sql)
+        Assert.Contains("[CreatedAt] datetimeoffset NOT NULL", sql)
+        Assert.Contains("[UpdatedAt] datetimeoffset NOT NULL", sql)
 
     [<Fact>]
     let ``CAP-persist.R1 User with the rule self has no Owner column`` () =
@@ -610,8 +612,17 @@ module ``CAP-persist-R8`` =
     [<Fact>]
     let ``CAP-persist.R8 no stored shape gives the full schema`` () =
         let models = [ (todoModel, [], todoAccess) ]
-        let sql = migrationSql None (shapeOf models) []
+        let next = shapeOf models
+        let sql = migrationSql None next []
         Assert.Equal(schema SqlServer models, sql)
+        // The caller that gets Ok stores the new shape; the next run reads it back.
+        let dir = tempDir ()
+        try
+            let path = Path.Combine(dir, "shape.json")
+            writeShape path next
+            Assert.Equal(Some next, okOf (readShape path))
+        finally
+            Directory.Delete(dir, true)
 
     [<Fact>]
     let ``CAP-persist.R8 a written shape reads back the same`` () =
