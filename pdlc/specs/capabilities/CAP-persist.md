@@ -21,7 +21,7 @@ SQL that the capability writes targets SQL Server.
 
 ### CAP-persist.R1 · Each model gets a table with its system columns
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the model `Todo` and its access rule. When the engine writes the schema, then the
   schema holds `CREATE TABLE [Todo]` with the columns `[Id] uniqueidentifier NOT NULL
@@ -43,7 +43,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-persist.R2 · Foreign keys are indexed and never cascade
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the model `Todo`, when the engine writes the schema, then the schema holds
   `ALTER TABLE [Todo] ADD CONSTRAINT [FK_Todo_List] FOREIGN KEY ([List]) REFERENCES
@@ -55,7 +55,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-persist.R3 · Each list query gets one index
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 The index columns are the owner, then the filter fields of the view, then the sort fields,
 then `Id`. An optional sort field is led by its `Has` column. Wide text is never indexed.
@@ -73,7 +73,7 @@ A unique semantic type gets a unique index.
 
 ### CAP-persist.R4 · Every list query filters by owner and names its columns
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the model `Todo` and its overrides, when the engine writes the list query, then
   the query starts with `SELECT TOP (@limit) [Id], [Title], [Due], [Priority], [Done]
@@ -89,7 +89,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-persist.R5 · Keyset paging returns each record one time
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given 25 todos of one user in one list, with 6 empty due dates and the rest spread over
   3 dates. When a caller pages through the list 4 at a time, then the caller gets each of
@@ -107,7 +107,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-persist.R6 · Deleting a parent deletes its children in one transaction
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a list with 3 todos, when a caller removes the list, then the list and its 3
   todos are gone.
@@ -118,7 +118,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-persist.R7 · A stale save fails with a conflict
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given a todo at version 3. When a caller saves the todo with version 3, then the save
   passes and the todo is at version 4.
@@ -130,7 +130,7 @@ Status: built · Intents: IN-0001
 
 ### CAP-persist.R8 · A migration never drops a column without a note
 
-Status: built · Intents: IN-0001
+Status: verified · Intents: IN-0001
 
 - Given the last shape of `Todo` with the column `Due`, and a new shape with the column
   `DueDate` and no `renamedFrom`. When the engine writes the migration, then the result is

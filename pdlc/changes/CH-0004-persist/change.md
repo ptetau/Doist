@@ -1,6 +1,6 @@
 # CH-0004 · Persist
 
-Intent: IN-0001 · Scope: CAP-persist · Status: building · Ticket: none · Branch: pdlc/CH-0004-persist · Base: pdlc/CH-0003-validate
+Intent: IN-0001 · Scope: CAP-persist · Status: in review · Ticket: none · Branch: pdlc/CH-0004-persist · Base: pdlc/CH-0003-validate
 Tests-Locked: bbd2344
 
 ## Delivers
@@ -272,3 +272,5 @@ none
 - 2026-10-19T06:56:21+00:00 · Verify round 1 failed on the caption of frame 40 (49 checks, 51 runs). Sent back
   to show. Filed IN-0011 (store fails closed), IN-0012 (listQuery finding), IN-0013
   (cursor privacy), and IN-0014 (persist tidy).
+- 2026-10-19T07:00:56+00:00 · Verify round 2: 139 of 139 checks pass, one group for each requirement. All four
+  remits that apply passed with 0 problems. The follow-ups repeat IN-0011 to IN-0014.
