@@ -1,7 +1,7 @@
 # CH-0002 · Access
 
 Intent: IN-0001 · Scope: CAP-access · Status: in review · Ticket: none · Branch: pdlc/CH-0002-access · Base: pdlc/CH-0001-models
-Tests-Locked: da2df15
+Tests-Locked: a042dce
 
 ## Delivers
 
@@ -180,3 +180,6 @@ none
   check files did not change after the lock. Specification, security, quality, and
   privacy passed with 0 problems. Compliance does not apply. Filed IN-0007 (checkChange
   fails closed) from the security follow-ups.
+- 2026-10-19T06:08:35+00:00 · Gate correction: the gate read a wrong version in the tests review that still
+  passed, a hard-coded reason. The test writer added a check with a second parent model
+  and field. It passes, because the code derives the reason. Locked again at a042dce.
