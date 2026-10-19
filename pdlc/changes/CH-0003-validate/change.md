@@ -1,6 +1,6 @@
 # CH-0003 · Validate
 
-Intent: IN-0001 · Scope: CAP-validate · Status: building · Ticket: none · Branch: pdlc/CH-0003-validate · Base: pdlc/CH-0002-access
+Intent: IN-0001 · Scope: CAP-validate · Status: in review · Ticket: none · Branch: pdlc/CH-0003-validate · Base: pdlc/CH-0002-access
 Tests-Locked: 6f34681
 
 ## Delivers
@@ -235,3 +235,6 @@ none
   never raises).
 - 2026-10-19T06:23:16+00:00 · Build round 2: the builder removed the three repeats that quality named. All 87
   checks pass. The check files did not change after the lock. Commit `40d743a`.
+- 2026-10-19T06:26:52+00:00 · Verify round 2: 87 of 87 checks pass, one group for each requirement. All four
+  remits that apply passed with 0 problems. The follow-ups repeat IN-0008 (parse messages
+  for all kinds), IN-0009 (parseField length), and IN-0010 (validate never raises).
