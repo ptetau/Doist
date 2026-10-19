@@ -1,0 +1,110 @@
+{
+  "kind": "terminal",
+  "title": "CH-0005 \u00b7 Checks",
+  "steps": [
+    {
+      "caption": "CH-0005 \u00b7 Build the engine library",
+      "run": "dotnet build src/Typed.Engine/Typed.Engine.fsproj --nologo -v q"
+    },
+    {
+      "caption": "CAP-checks.R1 \u00b7 A model with no access rule: MISSING_ACCESS_RULE",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R1.1"
+    },
+    {
+      "caption": "CAP-checks.R1 \u00b7 Two access rules for TodoList: more than one rule",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R1.2"
+    },
+    {
+      "caption": "CAP-checks.R1 \u00b7 The three todo models with three rules: no finding",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R1.3"
+    },
+    {
+      "caption": "CAP-checks.R2 \u00b7 Overrides for Ghost, not a model: MISSING_FIELD",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R2.1"
+    },
+    {
+      "caption": "CAP-checks.R2 \u00b7 Label for missing field Todo.Dew: MISSING_FIELD",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R2.2"
+    },
+    {
+      "caption": "CAP-checks.R3 \u00b7 Rule on Todo.Due with a string predicate: WRONG_CONFIG_TYPE",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R3.1"
+    },
+    {
+      "caption": "CAP-checks.R3 \u00b7 Rule on Todo.Title with a Title predicate: no finding",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R3.2"
+    },
+    {
+      "caption": "CAP-checks.R4 \u00b7 Column override on Todo.Version: SYSTEM_FIELD_TARGET",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R4.1"
+    },
+    {
+      "caption": "CAP-checks.R5 \u00b7 Todo alone, List refers to TodoList: DANGLING_REFERENCE",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R5.1"
+    },
+    {
+      "caption": "CAP-checks.R6 \u00b7 Ref to NoTitle with no titleField: NO_TITLE_FIELD",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R6.1"
+    },
+    {
+      "caption": "CAP-checks.R6 \u00b7 titleField override on NoTitle: no finding",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R6.2"
+    },
+    {
+      "caption": "CAP-checks.R7 \u00b7 ownedVia on Todo.Title: must be a reference",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R7.1"
+    },
+    {
+      "caption": "CAP-checks.R7 \u00b7 readOnlyWhenParent on TodoList.Name: not a bool field",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R7.2"
+    },
+    {
+      "caption": "CAP-checks.R8 \u00b7 unsafe \"rawName\" gives one warning with its reason",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R8.1"
+    },
+    {
+      "caption": "CAP-checks.R9 \u00b7 Label equal to the default: REDUNDANT_OVERRIDE warning",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R9.1"
+    },
+    {
+      "caption": "CAP-checks.R9 \u00b7 Label \"Due date\" differs from the default: no warning",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R9.2"
+    },
+    {
+      "caption": "CAP-checks.R10 \u00b7 The todo app: no error findings",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R10.1"
+    },
+    {
+      "caption": "CAP-checks.R11 \u00b7 Two label overrides on Todo.Due: WRONG_CONFIG_TYPE",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R11.1"
+    },
+    {
+      "caption": "CAP-checks.R11 \u00b7 One label and one readOnly on Due: no finding",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R11.2"
+    },
+    {
+      "caption": "CAP-checks.R12 \u00b7 TodoList then Todo: findings in model order",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R12.1"
+    },
+    {
+      "caption": "CAP-checks.R12 \u00b7 No models and no rules: no findings",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R12.2"
+    },
+    {
+      "caption": "CAP-checks.R13 \u00b7 listSort on wide text Notes: cannot sort",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R13.1"
+    },
+    {
+      "caption": "CAP-checks.R13 \u00b7 listView on a computed length: unsupported list view",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R13.2"
+    },
+    {
+      "caption": "CAP-checks.R13 \u00b7 listView on an equality: no finding",
+      "run": "dotnet fsi --quiet pdlc/changes/CH-0005-checks/show.fsx R13.3"
+    },
+    {
+      "caption": "CH-0005 \u00b7 All checks pass",
+      "run": "dotnet test tests/Typed.Engine.Tests --nologo -v q"
+    }
+  ]
+}
