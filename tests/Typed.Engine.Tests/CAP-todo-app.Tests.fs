@@ -257,7 +257,9 @@ module ``CAP-todo-app-R4`` =
     let ``CAP-todo-app.R4 ticking a todo sets CompletedAt to now`` () =
         let ctx = contextAt "UTC" (at 9)
         let previous = todo false None None
-        let saved = todo true None None
+        // The saved todo carries a stale time from the day before, so the hook must replace it with now.
+        let stale = DateTimeOffset(2026, 10, 17, 9, 0, 0, TimeSpan.Zero)
+        let saved = todo true (Some stale) None
         let result = Todo.App.Hooks.completionTime ctx (Some previous) saved
         Assert.Equal(Some(at 9), result.CompletedAt)
         Assert.True(result.Done)
