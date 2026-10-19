@@ -140,6 +140,17 @@ module ``CAP-checks-R3`` =
         Assert.Contains("DateOnly", msg, StringComparison.OrdinalIgnoreCase)
 
     [<Fact>]
+    let ``CAP-checks.R3 the message names the expected type DateOnly before the predicate type string`` () =
+        let item = Rule("Due", typeof<string>, (fun _ -> true), "Not valid")
+        let msg = onlyMessage ErrorCode.WRONG_CONFIG_TYPE (runAppWith [ todoSet [ item ] ])
+        // Expected shape: "... expects a predicate of type DateOnly, but the predicate takes string".
+        let expected = msg.IndexOf("DateOnly", StringComparison.Ordinal)
+        let taken = msg.IndexOf("string", StringComparison.OrdinalIgnoreCase)
+        Assert.True(expected >= 0, "The message lacks DateOnly: " + msg)
+        Assert.True(taken >= 0, "The message lacks string: " + msg)
+        Assert.True(expected < taken, "DateOnly must come before string: " + msg)
+
+    [<Fact>]
     let ``CAP-checks.R3 a rule predicate of type Title on Title has no such finding`` () =
         let item = Rule("Title", typeof<Title>, (fun _ -> true), "Not valid")
         let fs = runAppWith [ todoSet [ item ] ]
@@ -270,6 +281,16 @@ module ``CAP-checks-R9`` =
             "Override Todo.CompletedAt label matches the default.",
             onlyMessage ErrorCode.REDUNDANT_OVERRIDE (runAppWith sets)
         )
+
+    [<Fact>]
+    let ``CAP-checks.R9 a label of lower case due is not the default and gives no warning`` () =
+        let sets = [ overrides<Todo> [ label <@ fun (t: Todo) -> t.Due @> "due" ] ]
+        Assert.Empty(withCode ErrorCode.REDUNDANT_OVERRIDE (runAppWith sets))
+
+    [<Fact>]
+    let ``CAP-checks.R9 a label of upper case DUE is not the default and gives no warning`` () =
+        let sets = [ overrides<Todo> [ label <@ fun (t: Todo) -> t.Due @> "DUE" ] ]
+        Assert.Empty(withCode ErrorCode.REDUNDANT_OVERRIDE (runAppWith sets))
 
     [<Fact>]
     let ``CAP-checks.R9 a label that differs from the default has no warning`` () =
